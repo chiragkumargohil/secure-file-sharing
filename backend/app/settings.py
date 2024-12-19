@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django_otp.plugins.otp_totp',
     'corsheaders',
     'users',
+    'files',
 ]
 
 MIDDLEWARE = [
@@ -49,7 +50,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -140,7 +141,7 @@ PASSWORD_HASHERS = [
 
 # JWT Settings
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=45),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,
@@ -196,3 +197,9 @@ SESSION_COOKIE_SECURE = False  # Only send cookies over HTTPS
 SESSION_COOKIE_HTTPONLY = True  # Prevent access via JavaScript
 CSRF_COOKIE_SECURE = False
 CSRF_COOKIE_HTTPONLY = False
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+# disable CSRF protection
+CSRF_COOKIE_SAMESITE = "None"

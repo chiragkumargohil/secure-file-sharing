@@ -4,9 +4,8 @@ import {
   Outlet,
   Navigate,
 } from "react-router-dom";
-import { LoginPage, SignupPage } from "./pages";
+import { LoginPage, SignupPage, SharedFilePage, HomePage } from "./pages";
 import { Toaster } from "./components/ui/sonner";
-import Home from "./pages/home";
 import { useAuth } from "./hooks/use-auth";
 import { useEffect } from "react";
 import usersApi from "./apis/users";
@@ -22,6 +21,7 @@ const PrivateRoute = () => {
 const LoggedRoute = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { user } = useSelector((state: any) => state.auth);
+  console.log(user);
 
   return user ? <Navigate to="/" /> : <Outlet />;
 };
@@ -33,7 +33,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Home />,
+        element: <HomePage />,
       },
     ],
   },
@@ -57,6 +57,14 @@ const router = createBrowserRouter([
       },
     ],
   },
+  {
+    path: "/files/public/:uuid",
+    element: <SharedFilePage />,
+  },
+  {
+    path: "*",
+    element: <Navigate to="/" />,
+  },
 ]);
 
 const App = () => {
@@ -66,6 +74,9 @@ const App = () => {
     if (user) return;
 
     const getUser = async () => {
+      // if current url is '/files/public/:uuid' then return
+      if (window.location.pathname.includes("/files/public/")) return;
+
       try {
         const data = await usersApi.userProfile();
         login({

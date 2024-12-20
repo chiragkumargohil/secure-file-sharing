@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+import uuid
 
 # files and folders models
 
@@ -25,3 +26,27 @@ class File(models.Model):
 
   def __str__(self):
     return self.name
+
+# Shareable files
+
+class ShareableFileLink(models.Model):
+  file_id = models.ForeignKey(File, on_delete=models.CASCADE)
+  uuid = models.UUIDField(unique=True, default=uuid.uuid4, editable=False)
+  is_active = models.BooleanField(default=True)
+  expiration_date = models.DateTimeField(null=True, blank=True)
+  created_at = models.DateTimeField(auto_now_add=True)
+  updated_at = models.DateTimeField(auto_now=True)
+  
+  @property
+  def link(self):
+    return f"{settings.FRONTEND_URL}/share/{self.uuid}"
+  
+  def is_valid(self):
+    if not self.is_active:
+      return False
+    if self.expiration_date and self.expiration_date < self.created_at:
+      return False
+    return True
+
+  def __str__(self):
+    return self.uuid

@@ -10,14 +10,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import resourcesApi from "@/apis/resources";
+import ShareSettingsModal from "../modals/share-settings-modal";
 
 interface FileCardProps {
   id: string;
@@ -129,18 +123,13 @@ export function FileCard({
         </div>
       </CardContent>
 
-      <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Share File</DialogTitle>
-            <DialogDescription>
-              Choose how you want to share "{name}"
-            </DialogDescription>
-          </DialogHeader>
-          {/* Add sharing options here */}
-          <Button onClick={() => setIsShareDialogOpen(false)}>Generate Shareable Link</Button>
-        </DialogContent>
-      </Dialog>
+      {isShareDialogOpen && (
+        <ShareSettingsModal
+          id={id}
+          open={isShareDialogOpen}
+          onClose={() => setIsShareDialogOpen(false)}
+        />
+      )}
     </Card>
   );
 }

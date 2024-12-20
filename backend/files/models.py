@@ -50,3 +50,23 @@ class ShareableFileLink(models.Model):
 
   def __str__(self):
     return self.uuid
+
+class ShareFile(models.Model):
+  PERMISSION_TYPES = ['view', 'download', 'edit']
+
+  file = models.ForeignKey(File, on_delete=models.CASCADE)
+  sender_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+  receiver_email = models.EmailField()
+  access_type = models.CharField(max_length=255, choices=[('view', 'View'), ('download', 'Download'), ('edit', 'Edit')])
+  message = models.CharField(max_length=255, null=True, blank=True)
+  created_at = models.DateTimeField(auto_now_add=True)
+  updated_at = models.DateTimeField(auto_now=True)
+  
+  class Meta:
+    unique_together = ('file', 'receiver_email')
+  
+  def has_permission(self):
+    return self.access_type in self.PERMISSION_TYPES
+
+  def __str__(self):
+    return self.receiver_email

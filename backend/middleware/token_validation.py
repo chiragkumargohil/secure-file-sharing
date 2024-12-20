@@ -14,7 +14,6 @@ class JWTAuthenticationMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        print(request.path, request.path.startswith('/api/resources/files/public'))
         # Skip token validation for login/signup or non-API endpoints
         if request.path.startswith('/api/') and request.path not in ['/api/login/', '/api/signup/', '/api/logout/'] and request.path.startswith('/api/resources/files/public/') == False:
             token = ""

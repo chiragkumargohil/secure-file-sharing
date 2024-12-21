@@ -1,16 +1,7 @@
 import resourcesApi from "@/apis/resources.api";
-import usersApi from "@/apis/users.api";
 import { AppSidebar } from "@/components/app-sidebar";
 import { FileCard } from "@/components/cards/file-card";
 import { Button } from "@/components/ui";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
@@ -18,12 +9,10 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAuth } from "@/hooks/use-auth";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const Home = () => {
-  const { logout } = useAuth();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [files, setFiles] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState("my-files");
@@ -89,33 +78,6 @@ const Home = () => {
         <header className="flex sticky top-0 bg-background h-16 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="mr-2 h-4" />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="#">
-                  Building Your Application
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-          <Button
-            variant="destructive"
-            onClick={async () => {
-              try {
-                await usersApi.logout();
-                logout();
-              } catch (error) {
-                console.error(error);
-              }
-            }}
-            className="ml-auto"
-          >
-            Logout
-          </Button>
         </header>
 
         <div className="p-4 space-y-4">

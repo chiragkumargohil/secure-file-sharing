@@ -9,6 +9,10 @@ from django.contrib.auth.hashers import check_password
 from rest_framework.exceptions import AuthenticationFailed
 from django.conf import settings
 from .serializers import LoginSerializer, RegisterSerializer
+from .models import DriveAccess
+from rest_framework.serializers import ModelSerializer
+from rest_framework.decorators import authentication_classes
+from middleware.skip_csrf import CSRFExemptSessionAuthentication
 
 User = get_user_model()
 
@@ -198,5 +202,50 @@ class UserProfileView(APIView):
             }
             
             return Response(data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": "Something went wrong", "message": str(e)}, status=500)
+
+# DRIVE ACCESS
+@authentication_classes([CSRFExemptSessionAuthentication])
+class DriveAccessView(APIView):
+    def post(self, request, email):
+        try:
+            owner = request.user
+            role = request.data.get('role')
+            
+            DriveAccess.objects.update_or_create(owner=owner, receiver_email=email, defaults={'role': role})
+            
+            return Response({"message": "Access granted successfully"})
+        except Exception as e:
+            return Response({"error": "Something went wrong", "message": str(e)}, status=500)
+    
+    def delete(self, request, email):
+        try:
+            owner = request.user
+            
+            DriveAccess.objects.filter(owner=owner, receiver_email=email).delete()
+            
+            return Response({"message": "Access revoked successfully"})
+        except DriveAccess.DoesNotExist:
+            return Response({"message": "Access revoked successfully"})
+        except Exception as e:
+            return Response({"error": "Something went wrong", "message": str(e)}, status=500)
+
+class DriveAccessSerializer(ModelSerializer):
+    class Meta:
+        model = DriveAccess
+        # email and role
+        fields = ['receiver_email', 'role']
+
+class DriveAccessListView(APIView):
+    def get(self, request):
+        try:
+            owner = request.user
+            users = DriveAccess.objects.filter(owner=owner)
+            users = DriveAccessSerializer(users, many=True).data
+            
+            users = [{"email": user["receiver_email"], "role": user["role"]} for user in users]
+
+            return Response({"users": users})
         except Exception as e:
             return Response({"error": "Something went wrong", "message": str(e)}, status=500)

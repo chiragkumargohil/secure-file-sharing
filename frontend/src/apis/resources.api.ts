@@ -30,7 +30,10 @@ const resourcesApi = {
   // public files
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   configPublicFile: async function (fileId: string, data: any) {
-    const response = await api.post(`resources/public/files/settings/${fileId}/`, data);
+    const response = await api.post(
+      `resources/public/files/settings/${fileId}/`,
+      data
+    );
     return response.data;
   },
   getPublicFileSettings: async function (fileId: string) {
@@ -53,10 +56,7 @@ const resourcesApi = {
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   shareFile: async function (fileId: string, data: any) {
-    const response = await api.post(
-      `resources/shared/files/${fileId}/`,
-      data
-    );
+    const response = await api.post(`resources/shared/files/${fileId}/`, data);
     return response.data;
   },
   getSharedFiles: async function () {

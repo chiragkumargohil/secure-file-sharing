@@ -12,3 +12,23 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
+# for giving access to account
+class DriveAccess(models.Model):
+    ROLES = [
+        ('owner', 'Owner'),
+        ('editor', 'Editor'),
+        ('viewer', 'Viewer'),
+    ]
+
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    receiver_email = models.EmailField()
+    role = models.CharField(max_length=255, choices=ROLES)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('owner', 'receiver_email')
+
+    def __str__(self):
+        return self.receiver_email

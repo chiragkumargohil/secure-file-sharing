@@ -4,16 +4,10 @@ from rest_framework import status
 from django.http import FileResponse
 from .models import PublicFile
 from django.conf import settings
-from rest_framework.decorators import authentication_classes
-from rest_framework.authentication import SessionAuthentication
 from django.shortcuts import get_object_or_404
 from files.models import File
-
-# Skip CSRF validation for development
-class CSRFExemptSessionAuthentication(SessionAuthentication):
-    def enforce_csrf(self, request):
-        # Skip CSRF validation
-        return
+from rest_framework.decorators import authentication_classes
+from middleware.skip_csrf import CSRFExemptSessionAuthentication
 
 class PublicFileView(APIView):
   def get(self, request, file_uuid):
@@ -83,8 +77,6 @@ class PublicFileSettingsView(APIView):
       
       # Check if the file is already shared
       public_file = PublicFile.objects.update_or_create(file=file, defaults={'is_active': is_active, 'expiration_date': expiration_date})
-      
-      print(public_file)
       
       return Response({"id": public_file[0]}, status=status.HTTP_200_OK)
     except File.DoesNotExist:

@@ -4,7 +4,13 @@ import {
   Outlet,
   Navigate,
 } from "react-router-dom";
-import { LoginPage, SignupPage, SharedFilePage, HomePage } from "./pages";
+import {
+  LoginPage,
+  SignupPage,
+  SharedFilePage,
+  HomePage,
+  AccessPage,
+} from "./pages";
 import { Toaster } from "./components/ui/sonner";
 import { useAuth } from "./hooks/use-auth";
 import { useEffect } from "react";
@@ -37,6 +43,16 @@ const router = createBrowserRouter([
     ],
   },
   {
+    path: "/access",
+    element: <PrivateRoute />,
+    children: [
+      {
+        path: "/access",
+        element: <AccessPage />,
+      },
+    ],
+  },
+  {
     path: "/login",
     element: <LoggedRoute />,
     children: [
@@ -60,10 +76,10 @@ const router = createBrowserRouter([
     path: "/files/public/:uuid",
     element: <SharedFilePage />,
   },
-  {
-    path: "*",
-    element: <Navigate to="/" />,
-  },
+  // {
+  //   path: "*",
+  //   element: <Navigate to="/" />,
+  // },
 ]);
 
 const App = () => {

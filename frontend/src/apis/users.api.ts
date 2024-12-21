@@ -20,6 +20,11 @@ const usersApi = {
     const response = await api.get("users/profile/");
     return response.data;
   },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  updateProfile: async (data: any) => {
+    const response = await api.put("users/profile/", data);
+    return response.data;
+  },
 
   // drive access
   getDriveAccessEmails: async function () {

@@ -9,7 +9,14 @@ export function useAuth() {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const login = (user: any) => {
-    dispatch(setUser(user));
+    dispatch(
+      setUser({
+        email: user.email,
+        username: user.username,
+        firstName: user.first_name,
+        lastName: user.last_name,
+      })
+    );
   };
 
   const logout = () => {

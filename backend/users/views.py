@@ -8,7 +8,7 @@ import bcrypt
 from django.contrib.auth.hashers import check_password
 from rest_framework.exceptions import AuthenticationFailed
 from django.conf import settings
-from .serializers import LoginSerializer, RegisterSerializer
+from .serializers import LoginSerializer, RegisterSerializer, UpdateUserSerializer
 from .models import DriveAccess
 from rest_framework.serializers import ModelSerializer
 from rest_framework.decorators import authentication_classes
@@ -179,6 +179,7 @@ class UserLogoutView(APIView):
         except Exception as e:
             return Response({"error": "Something went wrong", "message": str(e)}, status=500)
 
+@authentication_classes([CSRFExemptSessionAuthentication])
 class UserProfileView(APIView):
     """
     View to return user profile data.
@@ -202,6 +203,18 @@ class UserProfileView(APIView):
             }
             
             return Response(data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": "Something went wrong", "message": str(e)}, status=500)
+    
+    def put(self, request):
+        """Update user's profile data."""
+        try:
+            user = request.user
+            serializer = UpdateUserSerializer(user, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message": "Profile updated successfully"})
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": "Something went wrong", "message": str(e)}, status=500)
 

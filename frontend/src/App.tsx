@@ -10,6 +10,7 @@ import {
   SharedFilePage,
   HomePage,
   AccessPage,
+  ProfilePage,
 } from "./pages";
 import { Toaster } from "./components/ui/sonner";
 import { useAuth } from "./hooks/use-auth";
@@ -49,6 +50,16 @@ const router = createBrowserRouter([
       {
         path: "/access",
         element: <AccessPage />,
+      },
+    ],
+  },
+  {
+    path: "/profile",
+    element: <PrivateRoute />,
+    children: [
+      {
+        path: "/profile",
+        element: <ProfilePage />,
       },
     ],
   },
@@ -94,10 +105,7 @@ const App = () => {
 
       try {
         const data = await usersApi.userProfile();
-        login({
-          email: data.email,
-          username: data.username,
-        });
+        login(data);
       } catch {
         logout();
       }

@@ -1,13 +1,7 @@
 import resourcesApi from "@/apis/resources.api";
-import { AppSidebar } from "@/components/app-sidebar";
 import { FileCard } from "@/components/cards/file-card";
+import PrimaryLayout from "@/components/layouts/primary-layout";
 import { Button } from "@/components/ui";
-import { Separator } from "@/components/ui/separator";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -72,40 +66,30 @@ const Home = () => {
   };
 
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex sticky top-0 bg-background h-16 shrink-0 items-center gap-2 border-b px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 h-4" />
-        </header>
-
-        <div className="p-4 space-y-4">
-          <form onSubmit={handleFormSubmit}>
-            <input type="file" name="files" multiple />
-            <Button type="submit">Upload</Button>
-          </form>
-          <Tabs defaultValue="my-files" onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="my-files">My Files</TabsTrigger>
-              <TabsTrigger value="shared-files">Shared with Me</TabsTrigger>
-            </TabsList>
-            <TabsContent value="my-files">
-              <h2 className="text-2xl font-bold mb-4">My Files</h2>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {renderFileCards(files)}
-              </div>
-            </TabsContent>
-            <TabsContent value="shared-files">
-              <h2 className="text-2xl font-bold mb-4">Files Shared with Me</h2>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {renderFileCards(files)}
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+    <PrimaryLayout>
+      <form onSubmit={handleFormSubmit}>
+        <input type="file" name="files" multiple />
+        <Button type="submit">Upload</Button>
+      </form>
+      <Tabs defaultValue="my-files" onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="my-files">My Files</TabsTrigger>
+          <TabsTrigger value="shared-files">Shared with Me</TabsTrigger>
+        </TabsList>
+        <TabsContent value="my-files">
+          <h2 className="text-2xl font-bold mb-4">My Files</h2>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {renderFileCards(files)}
+          </div>
+        </TabsContent>
+        <TabsContent value="shared-files">
+          <h2 className="text-2xl font-bold mb-4">Files Shared with Me</h2>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {renderFileCards(files)}
+          </div>
+        </TabsContent>
+      </Tabs>
+    </PrimaryLayout>
   );
 };
 

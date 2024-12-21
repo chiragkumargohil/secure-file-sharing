@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'users',
     'files',
     'public_files',
+    'shared_files',
 ]
 
 MIDDLEWARE = [

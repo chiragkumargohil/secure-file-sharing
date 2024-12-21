@@ -22,4 +22,5 @@ urlpatterns = [
     path("api/users/", include("users.urls")),
     path("api/resources/", include("files.urls")),
     path("api/resources/public/", include("public_files.urls")),
+    path("api/resources/shared/", include("shared_files.urls")),
 ]

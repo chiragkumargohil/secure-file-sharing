@@ -11,8 +11,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import resourcesApi from "@/apis/resources.api";
-import ShareSettingsModal from "../modals/share-settings-modal";
-// import { ShareFileModal } from "../modals/share-file-modal";
+// import ShareSettingsModal from "../modals/share-settings-modal";
+import { ShareFileModal as ShareSettingsModal } from "../modals/share-file-modal";
 
 interface FileCardProps {
   id: string;

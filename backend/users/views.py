@@ -13,6 +13,11 @@ from .models import DriveAccess
 from rest_framework.serializers import ModelSerializer
 from rest_framework.decorators import authentication_classes
 from middleware.skip_csrf import CSRFExemptSessionAuthentication
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.core.mail import send_mail
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes
+from django.conf import settings
 
 User = get_user_model()
 
@@ -121,7 +126,7 @@ class UserLoginView(APIView):
             if not check_password(password, user.password):
                 return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
             
-            response = Response({"message": "Login successful"}, status=status.HTTP_200_OK)
+            response = Response({"message": "Login successful", "user": {"email": user.email, "username": user.username, "first_name": user.first_name, "last_name": user.last_name}}, status=status.HTTP_200_OK)
             # get tokens
             tokens = get_tokens_for_user(user)
             
@@ -217,6 +222,49 @@ class UserProfileView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": "Something went wrong", "message": str(e)}, status=500)
+
+class ForgotPasswordView(APIView):
+    def post(self, request):
+        try:
+            email = request.data.get('email')
+            user = User.objects.get(email=email)
+            token_generator = PasswordResetTokenGenerator()
+            token = token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            reset_link = f"{settings.FRONTEND_URL}/reset-password/{uid}/{token}/"
+            print(reset_link)
+
+            # Send email
+            send_mail(
+                subject="Password Reset Request",
+                message=f"Click the link to reset your password: {reset_link}",
+                from_email="no-reply@secureapp.com",
+                recipient_list=[email],
+            )
+
+            return Response({"message": "Password reset email sent."}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"error": "Email not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": "Something went wrong", "message": str(e)}, status=500)
+
+class ResetPasswordConfirmView(APIView):
+    def post(self, request, uidb64, token):
+        try:
+            uid = urlsafe_base64_decode(uidb64).decode()
+            user = User.objects.get(pk=uid)
+            token_generator = PasswordResetTokenGenerator()
+
+            if not token_generator.check_token(user, token):
+                return Response({"error": "Invalid or expired token."}, status=status.HTTP_400_BAD_REQUEST)
+
+            new_password = request.data.get('password')
+            user.set_password(new_password)
+            user.save()
+
+            return Response({"message": "Password has been reset successfully."}, status=status.HTTP_200_OK)
+        except (User.DoesNotExist, ValueError):
+            return Response({"error": "Invalid token or user."}, status=status.HTTP_400_BAD_REQUEST)
 
 # DRIVE ACCESS
 @authentication_classes([CSRFExemptSessionAuthentication])

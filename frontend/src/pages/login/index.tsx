@@ -17,16 +17,20 @@ const LoginPage = () => {
       const formDataObj = parseForm(event);
       const { email, password } = formDataObj as TLoginData;
 
-      await usersApi.login({ email, password });
+      const data = await usersApi.login({ email, password });
       toast.success("Login successful");
 
       login({
-        email: email,
+        email: data?.user?.email,
+        username: data?.user?.username,
+        firstName: data?.user?.first_name,
+        lastName: data?.user?.last_name,
       });
 
       navigate("/");
     } catch (error) {
       console.error(error);
+      toast.error("Login failed");
     }
   };
 

@@ -22,6 +22,7 @@ const SignupPage = () => {
       navigate("/login");
     } catch (error) {
       console.error(error);
+      toast.error("Account creation failed");
     }
   };
 

@@ -35,13 +35,13 @@ const LoginForm = ({ className, ...props }: LoginFormProps) => {
               <div className="grid gap-2">
                 <div className="flex items-end">
                   <Label htmlFor="password">Password</Label>
-                  <a
-                    href="#"
+                  <Link
+                    to="/forgot-password"
                     className="ml-auto text-xs underline-offset-2 hover:underline"
                     tabIndex={-1}
                   >
                     Forgot your password?
-                  </a>
+                  </Link>
                 </div>
                 <Input id="password" name="password" type="password" required />
               </div>

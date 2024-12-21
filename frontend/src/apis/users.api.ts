@@ -25,6 +25,15 @@ const usersApi = {
     const response = await api.put("users/profile/", data);
     return response.data;
   },
+  forgotPassword: async (email: string) => {
+    const response = await api.post("users/forgot-password/", { email });
+    return response.data;
+  },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  resetPassword: async (uid: string, token: string, data: any) => {
+    const response = await api.post(`users/reset-password/${uid}/${token}/`, data);
+    return response.data;
+  },
 
   // drive access
   getDriveAccessEmails: async function () {

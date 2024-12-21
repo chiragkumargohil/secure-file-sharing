@@ -17,6 +17,8 @@ import { useAuth } from "./hooks/use-auth";
 import { useEffect } from "react";
 import usersApi from "./apis/users.api";
 import { useSelector } from "react-redux";
+import ForgotPasswordPage from "./pages/forgot-password";
+import ResetPasswordPage from "./pages/reset-password";
 
 const PrivateRoute = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -25,7 +27,7 @@ const PrivateRoute = () => {
   return user ? <Outlet /> : <Navigate to="/login" />;
 };
 
-const LoggedRoute = () => {
+const PublicRoute = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { user } = useSelector((state: any) => state.auth);
 
@@ -65,7 +67,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/login",
-    element: <LoggedRoute />,
+    element: <PublicRoute />,
     children: [
       {
         path: "/login",
@@ -75,7 +77,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/signup",
-    element: <LoggedRoute />,
+    element: <PublicRoute />,
     children: [
       {
         path: "/signup",
@@ -84,13 +86,33 @@ const router = createBrowserRouter([
     ],
   },
   {
+    path: "/forgot-password",
+    element: <PublicRoute />,
+    children: [
+      {
+        path: "/forgot-password",
+        element: <ForgotPasswordPage />,
+      },
+    ],
+  },
+  {
+    path: "/reset-password/:uid/:token",
+    element: <PublicRoute />,
+    children: [
+      {
+        path: "/reset-password/:uid/:token",
+        element: <ResetPasswordPage />,
+      },
+    ],
+  },
+  {
     path: "/files/public/:uuid",
     element: <SharedFilePage />,
   },
-  // {
-  //   path: "*",
-  //   element: <Navigate to="/" />,
-  // },
+  {
+    path: "*",
+    element: <Navigate to="/" />,
+  },
 ]);
 
 const App = () => {

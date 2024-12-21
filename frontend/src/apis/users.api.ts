@@ -5,19 +5,19 @@ import { api } from "./index";
 
 const usersApi = {
   register: async (data: TRegisterData) => {
-    const response = await api.post("register/", data);
+    const response = await api.post("users/register/", data);
     return response.data;
   },
   login: async (data: TLoginData) => {
-    const response = await api.post("login/", data);
+    const response = await api.post("users/login/", data);
     return response.data;
   },
   logout: async () => {
-    const response = await api.post("logout/");
+    const response = await api.post("users/logout/");
     return response.data;
   },
   userProfile: async () => {
-    const response = await api.get("profile/");
+    const response = await api.get("users/profile/");
     return response.data;
   },
 };

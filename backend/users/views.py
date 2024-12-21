@@ -8,7 +8,7 @@ import bcrypt
 from django.contrib.auth.hashers import check_password
 from rest_framework.exceptions import AuthenticationFailed
 from django.conf import settings
-from rest_framework.permissions import IsAuthenticated
+from .serializers import LoginSerializer, RegisterSerializer
 
 User = get_user_model()
 
@@ -23,11 +23,27 @@ def get_tokens_for_user(user):
 # User Registration View
 class UserRegisterView(APIView):
     def post(self, request):
+        """
+        Creates a new user with the given email and password, and generates a QR code for MFA setup.
+
+        Args:
+            request (Request): The request object containing the email and password.
+
+        Returns:
+            Response: A response object containing a success message and the MFA secret if the user is created successfully.
+        """
+        
+        # serialize the data
+        serializer = RegisterSerializer(data=request.data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
         username = request.data.get("username")
         email = request.data.get("email")
         password = request.data.get("password")
 
-        if not username or not email or not password:
+        if not email or not password:
             return Response({"error": "All fields are required"}, status=status.HTTP_400_BAD_REQUEST)
           
         try:
@@ -65,6 +81,30 @@ class UserRegisterView(APIView):
 # User Login View
 class UserLoginView(APIView):
     def post(self, request):
+        """
+        Handles user login by validating credentials and issuing JWT tokens.
+
+        Args:
+            request: The HTTP request object containing user login data.
+
+        Returns:
+            Response: A Django REST Framework Response object. On successful login,
+            returns a message "Login successful" with access and refresh tokens set
+            as HttpOnly cookies. On failure, returns an error message with the
+            appropriate HTTP status code.
+
+        Raises:
+            User.DoesNotExist: If the user with the given email does not exist.
+            AuthenticationFailed: If authentication fails due to invalid credentials.
+            Exception: For any other exceptions that may occur during the login process.
+        """
+
+        # serialize the data
+        serializer = LoginSerializer(data=request.data)
+        
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
         email = request.data.get("email")
         password = request.data.get("password")
         # mfa_code = request.data.get("mfa_code")
@@ -81,7 +121,7 @@ class UserLoginView(APIView):
             # get tokens
             tokens = get_tokens_for_user(user)
             
-            # set http only cookies
+            # set http only cookies / access token
             response.set_cookie(
                 key=settings.SIMPLE_JWT['AUTH_COOKIE'],
                 value=tokens["access"],
@@ -91,6 +131,7 @@ class UserLoginView(APIView):
                 # samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
             )
 
+            # set http only cookies / refresh token
             response.set_cookie(
                 key=settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'],
                 value=tokens["refresh"],
@@ -100,6 +141,11 @@ class UserLoginView(APIView):
                 # samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
             )
 
+            # Verify the password
+            # Verify MFA code
+            # totp = pyotp.TOTP(user.mfa_secret)
+            # if not totp.verify(mfa_code):
+            #     return Response({"error": "Invalid MFA code"}, status=status.HTTP_400_BAD_REQUEST)
             
             return response
         except User.DoesNotExist:
@@ -109,40 +155,48 @@ class UserLoginView(APIView):
         except Exception as e:
             return Response({"error": "Something went wrong", "message": str(e)}, status=500)
 
-        # Verify the password
-
-        # Verify MFA code
-        # totp = pyotp.TOTP(user.mfa_secret)
-        # if not totp.verify(mfa_code):
-        #     return Response({"error": "Invalid MFA code"}, status=status.HTTP_400_BAD_REQUEST)
-
 class UserLogoutView(APIView):
+    """
+    View to log out a user.
+    """
     def post(self, request):
-        response = Response({"message": "Logout successful"}, status=status.HTTP_200_OK)
-        response.delete_cookie("access_token")
-        response.delete_cookie("refresh_token")
-        
-        response.delete_cookie("access")
-        response.delete_cookie("refresh")
-        return response
+        """
+        Log out a user by deleting the access and refresh tokens.
+
+        Returns:
+            Response: A response object containing a success message.
+        """
+        try:
+            response = Response({"message": "Logout successful"}, status=status.HTTP_200_OK)
+            response.delete_cookie("access_token")
+            response.delete_cookie("refresh_token")
+
+            return response
+        except Exception as e:
+            return Response({"error": "Something went wrong", "message": str(e)}, status=500)
 
 class UserProfileView(APIView):
     """
     View to return user profile data.
     """
     def get(self, request):
-        user = request.user  # User is attached via middleware
+        """
+        Return user profile data.
 
-        if not user or not user.is_authenticated:
-            return Response({"error": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
+        Returns:
+            Response: A response object containing user profile data.
+        """
+        try:
+            user = request.user  # User is attached via middleware
 
-        # Return user profile data
-        data = {
-            'id': user.id,
-            'email': user.email,
-            'username': user.username,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-        }
-        
-        return Response(data, status=status.HTTP_200_OK)
+            # Return user profile data
+            data = {
+                'username': user.username,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+            }
+            
+            return Response(data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": "Something went wrong", "message": str(e)}, status=500)

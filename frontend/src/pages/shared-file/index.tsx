@@ -1,4 +1,4 @@
-import resourcesApi from "@/apis/resources";
+import resourcesApi from "@/apis/resources.api";
 import FilePreview from "@/components/file-preview";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";

@@ -5,6 +5,13 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+# List of allowed paths
+ALLOWED_PATHS = [
+    '/api/users/login/',
+    '/api/users/register/',
+    '/api/users/logout/'
+]
+
 class JWTAuthenticationMiddleware:
     """
     Middleware to validate JWT tokens and attach user to request.
@@ -15,7 +22,7 @@ class JWTAuthenticationMiddleware:
 
     def __call__(self, request):
         # Skip token validation for login/signup or non-API endpoints
-        if request.path.startswith('/api/') and request.path not in ['/api/login/', '/api/signup/', '/api/logout/'] and request.path.startswith('/api/resources/files/public/') == False:
+        if request.path.startswith('/api/') and request.path not in ALLOWED_PATHS and request.path.startswith('/api/resources/files/public/') == False:
             token = ""
             
             tokens = request.COOKIES

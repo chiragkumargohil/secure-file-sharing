@@ -8,7 +8,7 @@ import { LoginPage, SignupPage, SharedFilePage, HomePage } from "./pages";
 import { Toaster } from "./components/ui/sonner";
 import { useAuth } from "./hooks/use-auth";
 import { useEffect } from "react";
-import usersApi from "./apis/users";
+import usersApi from "./apis/users.api";
 import { useSelector } from "react-redux";
 
 const PrivateRoute = () => {
@@ -21,7 +21,6 @@ const PrivateRoute = () => {
 const LoggedRoute = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { user } = useSelector((state: any) => state.auth);
-  console.log(user);
 
   return user ? <Navigate to="/" /> : <Outlet />;
 };

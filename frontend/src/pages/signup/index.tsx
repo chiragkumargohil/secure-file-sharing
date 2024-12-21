@@ -1,4 +1,4 @@
-import usersApi from "@/apis/users";
+import usersApi from "@/apis/users.api";
 import { SignupForm } from "@/components/forms";
 import { parseForm } from "@/lib/functions";
 import { TRegisterData } from "@/types";

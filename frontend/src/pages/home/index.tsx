@@ -1,5 +1,5 @@
-import resourcesApi from "@/apis/resources";
-import usersApi from "@/apis/users";
+import resourcesApi from "@/apis/resources.api";
+import usersApi from "@/apis/users.api";
 import { AppSidebar } from "@/components/app-sidebar";
 import { FileCard } from "@/components/cards/file-card";
 import { Button } from "@/components/ui";
@@ -52,8 +52,8 @@ const Home = () => {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
-    const file = formData.get("file") as File;
-    if (!file) {
+    const files = formData.get("files") as File;
+    if (!files) {
       toast.error("No file selected");
     }
 
@@ -72,7 +72,7 @@ const Home = () => {
       <FileCard
         key={file.id}
         id={file.id}
-        name={file.name}
+        name={file.filename}
         size={file.size}
         updatedAt={file.updated_at}
         onDelete={() => {
@@ -120,7 +120,7 @@ const Home = () => {
 
         <div className="p-4 space-y-4">
           <form onSubmit={handleFormSubmit}>
-            <input type="file" name="file" />
+            <input type="file" name="files" multiple />
             <Button type="submit">Upload</Button>
           </form>
           <Tabs defaultValue="my-files" onValueChange={setActiveTab}>

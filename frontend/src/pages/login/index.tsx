@@ -1,4 +1,4 @@
-import usersApi from "@/apis/users";
+import usersApi from "@/apis/users.api";
 import { LoginForm } from "@/components/forms";
 import { useAuth } from "@/hooks/use-auth";
 import { parseForm } from "@/lib/functions";

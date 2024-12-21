@@ -17,37 +17,38 @@ const resourcesApi = {
     return response.data;
   },
   downloadFile: async function (fileId: string) {
-    const response = await api.get(`resources/files/${fileId}/download/`, {
+    const response = await api.get(`resources/files/download/${fileId}/`, {
       responseType: "blob",
     });
     return response;
   },
   deleteFile: async function (fileId: string) {
-    const response = await api.delete(`resources/files/${fileId}/delete/`);
+    const response = await api.delete(`resources/files/${fileId}/`);
     return response.data;
   },
+
+  // public files
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  generateShareableLink: async function (fileId: string, data: any) {
-    const response = await api.post(`resources/files/${fileId}/link/`, data);
+  configPublicFile: async function (fileId: string, data: any) {
+    const response = await api.post(`resources/public/files/settings/${fileId}/`, data);
+    return response.data;
+  },
+  getPublicFileSettings: async function (fileId: string) {
+    const response = await api.get(
+      `resources/public/files/settings/${fileId}/`
+    );
     return response.data;
   },
   viewFile: async function (fileUuid: string) {
-    const response = await api.get(`resources/files/public/${fileUuid}/`, {
+    const response = await api.get(`resources/public/files/${fileUuid}/`, {
       responseType: "blob",
     });
     return response;
   },
-  getShareSettings: async function (fileId: string) {
-    const response = await api.get(
-      "resources/files/" + fileId + "/share/settings/"
-    );
-    return response.data;
-  },
-  // share files
+
+  // shared files
   getSharedWith: async function (fileId: string) {
-    const response = await api.get(
-      "resources/files/" + fileId + "/share/"
-    );
+    const response = await api.get("resources/files/" + fileId + "/share/");
     return response.data;
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

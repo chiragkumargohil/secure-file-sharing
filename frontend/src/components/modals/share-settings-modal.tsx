@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import "react-datepicker/dist/react-datepicker.css";
-import resourcesApi from "@/apis/resources";
+import resourcesApi from "@/apis/resources.api";
 import { toast } from "sonner";
 
 interface ShareSettingsModalProps {
@@ -31,7 +31,7 @@ const ShareSettingsModal = ({ id, open, onClose }: ShareSettingsModalProps) => {
     if (open) {
       const fetchShareSettings = async () => {
         try {
-          const shareSettings = await resourcesApi.getShareSettings(id);
+          const shareSettings = await resourcesApi.getPublicFileSettings(id);
           // set the form values based on the share settings
           const isActive = shareSettings.is_active;
           const expirationDate = shareSettings.expiration_date;
@@ -55,7 +55,7 @@ const ShareSettingsModal = ({ id, open, onClose }: ShareSettingsModalProps) => {
 
   const handleSubmit = async () => {
     try {
-      const data = await resourcesApi.generateShareableLink(id, {
+      const data = await resourcesApi.configPublicFile(id, {
         is_active: isActive,
         expiration_date: isActive ? expirationDate : null,
       });

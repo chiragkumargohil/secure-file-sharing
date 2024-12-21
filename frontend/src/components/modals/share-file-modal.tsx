@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/select";
 import { X } from "lucide-react";
 import "react-datepicker/dist/react-datepicker.css";
-import resourcesApi from "@/apis/resources";
+import resourcesApi from "@/apis/resources.api";
 
 interface ShareSettingsModalProps {
   id: string;

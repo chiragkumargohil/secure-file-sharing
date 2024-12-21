@@ -10,9 +10,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import resourcesApi from "@/apis/resources";
-// import ShareSettingsModal from "../modals/share-settings-modal";
-import { ShareFileModal } from "../modals/share-file-modal";
+import resourcesApi from "@/apis/resources.api";
+import ShareSettingsModal from "../modals/share-settings-modal";
+// import { ShareFileModal } from "../modals/share-file-modal";
 
 interface FileCardProps {
   id: string;
@@ -125,7 +125,7 @@ export function FileCard({
       </CardContent>
 
       {isShareDialogOpen && (
-        <ShareFileModal
+        <ShareSettingsModal
           id={id}
           open={isShareDialogOpen}
           onClose={() => setIsShareDialogOpen(false)}

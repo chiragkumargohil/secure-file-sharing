@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'users',
     'files',
+    'public_files',
 ]
 
 MIDDLEWARE = [
@@ -130,7 +131,14 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'users.CustomUser'
+AUTH_USER_MODEL = 'users.User'
+
+MODEL = {
+    'USER': 'users.User',
+    'FILE': 'files.File',
+    'PUBLIC_FILE': 'files.PublicFile',
+    'SHARED_FILE': 'files.SharedFile',
+}
 
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',

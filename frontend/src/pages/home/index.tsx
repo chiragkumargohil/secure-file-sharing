@@ -87,18 +87,16 @@ const Home = () => {
         </div>
       )}
       <Tabs defaultValue="my-files" onValueChange={setActiveTab}>
-        <TabsList className="w-full justify-start">
-          <TabsTrigger value="my-files" className="py-2">
-            My Files
-          </TabsTrigger>
-          <TabsTrigger
-            value="shared-files"
-            className="py-2"
-            disabled={!canViewSharedFiles}
-          >
-            Shared with Me
-          </TabsTrigger>
-        </TabsList>
+        {canViewSharedFiles && (
+          <TabsList className="w-full justify-start">
+            <TabsTrigger value="my-files" className="py-2">
+              My Files
+            </TabsTrigger>
+            <TabsTrigger value="shared-files" className="py-2">
+              Shared with Me
+            </TabsTrigger>
+          </TabsList>
+        )}
         <TabsContent value="my-files" className="space-y-2 py-2">
           <div className="flex items-center justify-between gap-2">
             <h2 className="text-2xl font-bold mb-4">My Files</h2>
@@ -106,10 +104,12 @@ const Home = () => {
           </div>
           <div className="flex flex-wrap gap-4">{renderFileCards(files)}</div>
         </TabsContent>
-        <TabsContent value="shared-files" className="space-y-2 py-2">
-          <h2 className="text-2xl font-bold mb-4">Shared with Me</h2>
-          <div className="flex flex-wrap gap-4">{renderFileCards(files)}</div>
-        </TabsContent>
+        {canViewSharedFiles && (
+          <TabsContent value="shared-files" className="space-y-2 py-2">
+            <h2 className="text-2xl font-bold mb-4">Shared with Me</h2>
+            <div className="flex flex-wrap gap-4">{renderFileCards(files)}</div>
+          </TabsContent>
+        )}
       </Tabs>
     </>
   );

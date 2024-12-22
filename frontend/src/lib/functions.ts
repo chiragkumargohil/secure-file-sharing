@@ -3,4 +3,7 @@ const parseForm = (event: React.FormEvent<HTMLFormElement>) => {
   return Object.fromEntries(formData.entries());
 };
 
-export { parseForm };
+const isValidEmail = (email: string) =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+export { parseForm, isValidEmail };

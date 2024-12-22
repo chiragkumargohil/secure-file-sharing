@@ -2,7 +2,7 @@
 import { setUser } from "@/redux/slices/auth-slice";
 import { useDispatch, useSelector } from "react-redux";
 
-export function useAuth() {
+const useAuth = () => {
   const dispatch = useDispatch();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { user } = useSelector((state: any) => state.auth);
@@ -27,5 +27,7 @@ export function useAuth() {
     dispatch(setUser(null));
   };
 
-  return { user: user?.payload ?? null, login, logout };
-}
+  return { user: user ?? null, login, logout };
+};
+
+export default useAuth;

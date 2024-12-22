@@ -23,6 +23,7 @@ from io import BytesIO
 from django.http import FileResponse
 from django.core.files import File
 from middleware.role_accessibility import role_accessibility
+from common.utils.otp_utils import send_otp, verify_otp
 
 User = get_user_model()
 
@@ -114,7 +115,7 @@ class UserLoginView(APIView):
 
         email = request.data.get("email")
         password = request.data.get("password")
-        mfa_code = request.data.get("mfa_code")
+        otp = request.data.get("otp")
 
         if not email or not password:
             return Response({"error": "All fields are required"}, status=status.HTTP_400_BAD_REQUEST)
@@ -125,17 +126,17 @@ class UserLoginView(APIView):
             if not check_password(password, user.password):
                 return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
             
+            # if otp is provided, verify it
             if user.is_mfa_enabled:
-                print(settings.EMAIL_HOST_USER)
-                send_mail(
-                    'MFA Code',
-                    f'Your MFA code is: {mfa_code}',
-                    settings.EMAIL_HOST_USER,
-                    [user.email],
-                    fail_silently=False
-                )
-                if not pyotp.TOTP(user.mfa_secret).verify(mfa_code):
-                    return Response({"error": "Invalid MFA code"}, status=status.HTTP_400_BAD_REQUEST)
+                if otp:
+                    if not user.mfa_secret:
+                        return Response({"error": "MFA is not enabled for this user."}, status=status.HTTP_400_BAD_REQUEST)
+                    
+                    if not verify_otp(user.mfa_secret, otp):
+                        return Response({"error": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    send_otp(user.email, user.mfa_secret)
+                    return Response({"message": "OTP sent successfully", "is_otp_required": True}, status=status.HTTP_200_OK)
             
             # fetch the drives user has access to
             drives = DriveAccess.objects.filter(receiver_email=serialized_user['email'])

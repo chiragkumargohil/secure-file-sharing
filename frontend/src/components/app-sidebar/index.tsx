@@ -10,7 +10,7 @@ import {
 import { Link } from "react-router-dom";
 import { Button } from "../ui";
 import usersApi from "@/apis/users.api";
-import { useAuth } from "@/hooks/use-auth";
+import useAuth from "@/hooks/use-auth";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
 

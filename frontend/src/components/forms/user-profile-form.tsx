@@ -6,7 +6,6 @@ import { Switch } from "@/components/ui/switch";
 import usersApi from "@/apis/users.api";
 import { setUser } from "@/redux/slices/auth-slice";
 import { toast } from "sonner";
-import MFAQRCode from "../mfa-qr-code";
 
 const UserProfileForm = () => {
   const dispatch = useDispatch();
@@ -91,8 +90,6 @@ const UserProfileForm = () => {
         />
         <Label htmlFor="isMfaEnabled">Enable Two-Factor Authentication</Label>
       </div>
-
-      {user.isMfaEnabled && <MFAQRCode />}
 
       <Button type="submit" className="w-full">
         Update

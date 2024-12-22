@@ -13,7 +13,7 @@ import {
   ProfilePage,
 } from "./pages";
 import { Toaster } from "./components/ui/sonner";
-import { useAuth } from "./hooks/use-auth";
+import useAuth from "./hooks/use-auth";
 import { useEffect, useState } from "react";
 import usersApi from "./apis/users.api";
 import { useSelector } from "react-redux";

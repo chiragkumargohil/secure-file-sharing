@@ -7,7 +7,7 @@ export type TRegisterData = {
 export type TLoginData = {
   email: string;
   password: string;
-  mfa_code?: string;
+  otp?: string;
 };
 
 export type TUserAccess = {

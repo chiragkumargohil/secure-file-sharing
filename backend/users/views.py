@@ -128,7 +128,8 @@ class UserLoginView(APIView):
                 return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
             
             # if otp is provided, verify it
-            if user.is_mfa_enabled:
+            # DEV: if email is provided, send otp
+            if settings.EMAIL_HOST_USER and user.is_mfa_enabled:
                 if otp:
                     if not user.mfa_secret:
                         return Response({"error": "MFA is not enabled for this user."}, status=status.HTTP_400_BAD_REQUEST)

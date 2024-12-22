@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 import { Button } from "../ui";
 import usersApi from "@/apis/users.api";
 import { useAuth } from "@/hooks/use-auth";
+import { useSelector } from "react-redux";
 
 // This is sample data.
 const data = {
@@ -32,6 +33,8 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { user } = useSelector((state: any) => state.auth);
   const { logout } = useAuth();
 
   return (
@@ -48,6 +51,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </h3>
           </Link>
         ))}
+        {user && (
+          <div className="px-3 py-2 text-base font-semibold rounded hover:bg-muted">
+            {user.email}
+          </div>
+        )}
         <Button
           className="mt-auto"
           onClick={async () => {

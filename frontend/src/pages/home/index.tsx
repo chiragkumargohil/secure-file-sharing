@@ -13,15 +13,15 @@ const Home = () => {
 
   const getFiles = async () => {
     try {
-      let files = {
+      let data = {
         files: [],
       };
       if (activeTab === "my-files") {
-        files = await resourcesApi.getFiles();
+        data = await resourcesApi.getFiles();
       } else if (activeTab === "shared-files") {
-        files = await resourcesApi.getSharedFiles();
+        data = await resourcesApi.getSharedFiles();
       }
-      setFiles(files.files || []);
+      setFiles(data.files || []);
     } catch (error) {
       console.error(error);
     }

@@ -17,7 +17,7 @@ class User(AbstractUser):
 # for giving access to account
 class DriveAccess(models.Model):
     ROLES = [
-        ('owner', 'Owner'),
+        ('admin', 'Admin'),
         ('editor', 'Editor'),
         ('viewer', 'Viewer'),
     ]

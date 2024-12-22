@@ -59,6 +59,11 @@ const DriveSwitcher = () => {
                   <span className="truncate">
                     {selectedDrive?.owner ?? "My Drive"}
                   </span>
+                  {selectedDrive?.role && (
+                    <span className="text-xs text-muted-foreground">
+                      {selectedDrive.role}
+                    </span>
+                  )}
                 </div>
               </Tooltip>
               <ChevronsUpDown className="ml-auto" />

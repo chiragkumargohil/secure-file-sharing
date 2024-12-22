@@ -3,21 +3,17 @@ from rest_framework.response import Response
 from django.http import FileResponse
 from rest_framework import status
 from .models import File
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import authentication_classes
 from django.conf import settings
 from .serializers import UploadSerializer, FileSerializer
+from middleware.role_based_access import AccessControlMixin
+from middleware.skip_csrf import CSRFExemptSessionAuthentication
+from django.utils.decorators import method_decorator
 
 User = settings.AUTH_USER_MODEL
 
-# Skip CSRF validation for development
-class CSRFExemptSessionAuthentication(SessionAuthentication):
-    def enforce_csrf(self, request):
-        # Skip CSRF validation
-        return
-
 @authentication_classes([CSRFExemptSessionAuthentication])
-class FilesView(APIView):
+class FilesView(AccessControlMixin, APIView):
   serializer_class = UploadSerializer
 
   def post(self, request):
@@ -56,7 +52,7 @@ class FilesView(APIView):
         Response: A response object containing a list of files.
     """
     try:
-      files = File.objects.filter(owner=request.user)
+      files = File.objects.filter(owner=request.drive_user)
       files = FileSerializer(files, many=True).data
       return Response({"files": files}, status=status.HTTP_200_OK)
     except Exception as e:

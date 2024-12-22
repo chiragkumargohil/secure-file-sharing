@@ -32,7 +32,6 @@ const FilePreviewModal = ({ open, onClose, fileId }: FilePreviewModalProps) => {
           type: response.headers["content-type"],
         });
 
-        console.log(response.headers);
         const filename = contentDisposition
           ? contentDisposition.split("filename=")[1]
           : "";

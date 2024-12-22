@@ -7,7 +7,7 @@ import {
 import {
   LoginPage,
   SignupPage,
-  SharedFilePage,
+  PublicFilePage,
   HomePage,
   AccessPage,
   ProfilePage,
@@ -103,7 +103,7 @@ const App = () => {
     },
     {
       path: "/files/public/:uuid",
-      element: <SharedFilePage />,
+      element: <PublicFilePage />,
     },
     {
       path: "*",

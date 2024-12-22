@@ -10,6 +10,7 @@ from middleware.skip_csrf import CSRFExemptSessionAuthentication
 from common.utils.file_encryption import decrypt_file
 from django.core.files.base import ContentFile
 from middleware.role_accessibility import role_accessibility
+from django.utils import timezone
 
 class PublicFileView(APIView):
   def get(self, request, file_uuid):
@@ -29,6 +30,9 @@ class PublicFileView(APIView):
       is_valid = public_file.is_valid()
       
       if not is_valid:
+        return Response({"error": "Link has expired"}, status=status.HTTP_400_BAD_REQUEST)
+
+      if public_file.expiration_date and public_file.expiration_date.date() < timezone.now().date():
         return Response({"error": "Link has expired"}, status=status.HTTP_400_BAD_REQUEST)
       
       file = public_file.file

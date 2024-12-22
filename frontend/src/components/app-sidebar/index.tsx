@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import VersionSwitcher from "@/components/version-switcher";
+import DriveSwitcher from "@/components/drive-switcher";
 import {
   Sidebar,
   SidebarContent,
@@ -37,10 +37,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar {...props}>
       <SidebarHeader>
-        <VersionSwitcher
-          versions={data.versions}
-          defaultVersion={data.versions[0]}
-        />
+        <DriveSwitcher />
       </SidebarHeader>
       <SidebarContent className="gap-0 p-2">
         {/* We create a collapsible SidebarGroup for each parent. */}

@@ -15,6 +15,8 @@ export function useAuth() {
         username: user.username,
         firstName: user.first_name,
         lastName: user.last_name,
+        drives: Array.isArray(user.drives) ? user.drives : [],
+        drive: user.drive ?? null,
       })
     );
   };

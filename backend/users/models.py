@@ -6,7 +6,8 @@ class User(AbstractUser):
     is_mfa_enabled = models.BooleanField(default=False)
     mfa_secret = models.CharField(max_length=255, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+    selected_drive = models.ForeignKey('users.DriveAccess', on_delete=models.SET_NULL, blank=True, null=True)
+
     # remove is_staff field
     is_staff = None
 

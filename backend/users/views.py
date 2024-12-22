@@ -8,9 +8,8 @@ import bcrypt
 from django.contrib.auth.hashers import check_password
 from rest_framework.exceptions import AuthenticationFailed
 from django.conf import settings
-from .serializers import LoginSerializer, RegisterSerializer, UpdateUserSerializer
+from .serializers import LoginSerializer, RegisterSerializer, UpdateUserSerializer, DriveAccessSerializer, DriveAccessListSerializer, ProfileSerializer
 from .models import DriveAccess
-from rest_framework.serializers import ModelSerializer
 from rest_framework.decorators import authentication_classes
 from middleware.skip_csrf import CSRFExemptSessionAuthentication
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -18,6 +17,7 @@ from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.conf import settings
+from django.shortcuts import get_object_or_404
 
 User = get_user_model()
 
@@ -198,13 +198,21 @@ class UserProfileView(APIView):
         """
         try:
             user = request.user  # User is attached via middleware
+            user = ProfileSerializer(user).data
+            
+            # fetch the drives user has access to
+            drives = DriveAccess.objects.filter(receiver_email=user['email'])
+            drives = DriveAccessSerializer(drives, many=True).data
+            drives = [{'id': drive['id'], 'role': drive['role'], 'owner': drive['owner']['email']} for drive in drives]
 
             # Return user profile data
             data = {
-                'username': user.username,
-                'email': user.email,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
+                'username': user['username'],
+                'email': user['email'],
+                'first_name': user['first_name'],
+                'last_name': user['last_name'],
+                'drive': user['selected_drive'],
+                'drives': drives or [],
             }
             
             return Response(data, status=status.HTTP_200_OK)
@@ -225,6 +233,21 @@ class UserProfileView(APIView):
 
 class ForgotPasswordView(APIView):
     def post(self, request):
+        """
+        Handle password reset requests by generating and sending a password reset email.
+
+        This method retrieves the user's email from the request, generates a unique
+        password reset token, and constructs a reset link. The link is then emailed
+        to the user. If the email is not found, it returns a 404 error response.
+
+        Args:
+            request: The HTTP request object containing the user's email.
+
+        Returns:
+            Response: A response object indicating whether the password reset email
+                    was sent successfully or containing an error message.
+        """
+
         try:
             email = request.data.get('email')
             user = User.objects.get(email=email)
@@ -250,6 +273,16 @@ class ForgotPasswordView(APIView):
 
 class ResetPasswordConfirmView(APIView):
     def post(self, request, uidb64, token):
+        """
+        Verify the password reset token and set a new password for the user.
+
+        Args:
+            uidb64 (str): URL-safe base64-encoded user ID.
+            token (str): Password reset token.
+
+        Returns:
+            Response: A response object containing a success message if the password is reset successfully.
+        """
         try:
             uid = urlsafe_base64_decode(uidb64).decode()
             user = User.objects.get(pk=uid)
@@ -270,6 +303,16 @@ class ResetPasswordConfirmView(APIView):
 @authentication_classes([CSRFExemptSessionAuthentication])
 class DriveAccessView(APIView):
     def post(self, request, email):
+        """
+        Grant access to a user to access the current user's drive.
+
+        Args:
+            email (str): Email of the user to grant access to.
+
+        Returns:
+            Response: A response object containing a success message if the access is granted successfully.
+        """
+        
         try:
             owner = request.user
             role = request.data.get('role')
@@ -281,6 +324,18 @@ class DriveAccessView(APIView):
             return Response({"error": "Something went wrong", "message": str(e)}, status=500)
     
     def delete(self, request, email):
+        """
+        Revoke drive access for a specified user.
+
+        Args:
+            request: The HTTP request object.
+            email (str): The email of the user whose access is to be revoked.
+
+        Returns:
+            Response: A response object containing a success message if the access
+                    is revoked successfully, or an error message if something goes wrong.
+        """
+
         try:
             owner = request.user
             
@@ -292,21 +347,36 @@ class DriveAccessView(APIView):
         except Exception as e:
             return Response({"error": "Something went wrong", "message": str(e)}, status=500)
 
-class DriveAccessSerializer(ModelSerializer):
-    class Meta:
-        model = DriveAccess
-        # email and role
-        fields = ['receiver_email', 'role']
-
 class DriveAccessListView(APIView):
     def get(self, request):
+        """
+        Return a list of users with whom the current user has shared access to their Google Drive.
+
+        Returns:
+            Response: A response object containing a list of users with their respective roles.
+        """
         try:
             owner = request.user
             users = DriveAccess.objects.filter(owner=owner)
-            users = DriveAccessSerializer(users, many=True).data
+            users = DriveAccessListSerializer(users, many=True).data
             
             users = [{"email": user["receiver_email"], "role": user["role"]} for user in users]
 
             return Response({"users": users})
+        except Exception as e:
+            return Response({"error": "Something went wrong", "message": str(e)}, status=500)
+
+@authentication_classes([CSRFExemptSessionAuthentication])
+class SwitchDriveView(APIView):
+    def put(self, request):
+        try:
+            drive_id = request.data.get('drive_id')
+            drive = None
+            if drive_id:
+                drive = get_object_or_404(DriveAccess, id=drive_id)
+            user = request.user
+            user.selected_drive = drive
+            user.save()
+            return Response({"message": "Drive switched successfully"})
         except Exception as e:
             return Response({"error": "Something went wrong", "message": str(e)}, status=500)

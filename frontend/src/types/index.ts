@@ -14,3 +14,9 @@ export type TUserAccess = {
   email: string;
   role: "admin" | "editor" | "viewer";
 };
+
+export type TDriveAccess = {
+  id?: string;
+  owner: string;
+  role: "admin" | "editor" | "viewer";
+};

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Download, Trash2, Share2, MoreHorizontal } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,9 +10,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import resourcesApi from "@/apis/resources.api";
 import ShareSettingsModal from "../modals/share-settings-modal";
-// import { ShareFileModal as ShareSettingsModal } from "../modals/share-file-modal";
+import { ShareFileModal } from "../modals/share-file-modal";
+import FilePreviewModal from "../modals/file-preview-modal";
 
 interface FileCardProps {
   id: string;
@@ -30,6 +41,10 @@ export function FileCard({
   onDelete,
 }: FileCardProps) {
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isShareSpecificDialogOpen, setIsShareSpecificDialogOpen] =
+    useState(false);
+  const [isViewFileDialogOpen, setIsViewFileDialogOpen] = useState(false);
 
   const onDownload = async () => {
     try {
@@ -85,11 +100,22 @@ export function FileCard({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setIsViewFileDialogOpen(true)}>
+                View file
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={onDownload}>Download</DropdownMenuItem>
               <DropdownMenuItem onClick={() => setIsShareDialogOpen(true)}>
-                Share
+                Share publicly
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={onDelete} className="text-red-600">
+              <DropdownMenuItem
+                onClick={() => setIsShareSpecificDialogOpen(true)}
+              >
+                Share with specific users
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setIsDeleteDialogOpen(true)}
+                className="text-red-600"
+              >
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -97,30 +123,9 @@ export function FileCard({
         </div>
         <div className="text-sm text-gray-500 mb-4">
           <p>Size: {formatFileSize(size)}</p>
-          <p>Updated: {updatedAt.toLocaleString()}</p>
-        </div>
-        <div className="flex justify-between">
-          <Button variant="outline" size="sm" onClick={onDownload}>
-            <Download className="h-4 w-4 mr-2" />
-            Download
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsShareDialogOpen(true)}
-          >
-            <Share2 className="h-4 w-4 mr-2" />
-            Share
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleDelete}
-            className="text-red-600"
-          >
-            <Trash2 className="h-4 w-4 mr-2" />
-            Delete
-          </Button>
+          <p>
+            Updated: {updatedAt ? new Date(updatedAt).toLocaleString() : "-"}
+          </p>
         </div>
       </CardContent>
 
@@ -131,6 +136,52 @@ export function FileCard({
           onClose={() => setIsShareDialogOpen(false)}
         />
       )}
+
+      {isShareSpecificDialogOpen && (
+        <ShareFileModal
+          id={id}
+          open={isShareSpecificDialogOpen}
+          onClose={() => setIsShareSpecificDialogOpen(false)}
+        />
+      )}
+
+      {isViewFileDialogOpen && (
+        <FilePreviewModal
+          open={isViewFileDialogOpen}
+          onClose={() => setIsViewFileDialogOpen(false)}
+          file={{
+            name,
+            type: "file",
+            url: `/api/resources/${id}`,
+          }}
+        />
+      )}
+
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Are you sure you want to delete this file?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              file.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-red-600 text-white hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }

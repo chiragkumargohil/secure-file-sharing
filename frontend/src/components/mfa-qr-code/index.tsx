@@ -8,7 +8,6 @@ const MFAQRCode = () => {
     const fetchQrCode = async () => {
       try {
         const response = await usersApi.getMFAQR();
-        // response is a buffer
         const blob = new Blob([response.data], {
           type: "image/png",
         })

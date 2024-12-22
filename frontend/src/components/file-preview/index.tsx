@@ -17,6 +17,16 @@ export default function FilePreview({ file }: { file: any }) {
             />
           </div>
         );
+      case fileType === "mp4":
+        return (
+          <video
+            src={fileUrl}
+            controls
+            className="w-full h-96 object-contain"
+          ></video>
+        );
+      case fileType === "mp3":
+        return <audio src={fileUrl} controls className="w-full h-96"></audio>;
       case fileType === "pdf":
         return (
           <iframe
@@ -50,10 +60,7 @@ export default function FilePreview({ file }: { file: any }) {
   return (
     <div className="bg-white shadow-md rounded-lg overflow-hidden">
       <div className="p-4 border-b">
-        <div className="flex items-center">
-          {getFileIcon()}
-          <span className="font-semibold">{file.filename}</span>
-        </div>
+        <div className="flex items-center">{getFileIcon()}</div>
       </div>
       <div className="p-4">{renderPreview()}</div>
     </div>

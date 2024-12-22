@@ -1,10 +1,8 @@
+import { useEffect, useState } from "react";
 import resourcesApi from "@/apis/resources.api";
 import { FileCard } from "@/components/cards/file-card";
-import PrimaryLayout from "@/components/layouts/primary-layout";
-import { Button } from "@/components/ui";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import UploadFileModal from "@/components/modals/upload-file-modal";
 
 const Home = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -31,24 +29,6 @@ const Home = () => {
     getFiles();
   }, [activeTab]);
 
-  const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    const formData = new FormData(event.currentTarget);
-    const files = formData.get("files") as File;
-    if (!files) {
-      toast.error("No file selected");
-    }
-
-    try {
-      await resourcesApi.uploadFile(formData);
-      toast.success("File uploaded successfully");
-      getFiles();
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const renderFileCards = (files: any[]) => {
     return files.map((file) => (
@@ -66,30 +46,23 @@ const Home = () => {
   };
 
   return (
-    <PrimaryLayout>
-      <form onSubmit={handleFormSubmit}>
-        <input type="file" name="files" multiple />
-        <Button type="submit">Upload</Button>
-      </form>
-      <Tabs defaultValue="my-files" onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="my-files">My Files</TabsTrigger>
-          <TabsTrigger value="shared-files">Shared with Me</TabsTrigger>
-        </TabsList>
-        <TabsContent value="my-files">
+    <Tabs defaultValue="my-files" onValueChange={setActiveTab}>
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="my-files" className="py-2">My Files</TabsTrigger>
+        <TabsTrigger value="shared-files" className="py-2">Shared with Me</TabsTrigger>
+      </TabsList>
+      <TabsContent value="my-files" className="space-y-2 py-2">
+        <div className="flex items-center justify-between gap-2">
           <h2 className="text-2xl font-bold mb-4">My Files</h2>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {renderFileCards(files)}
-          </div>
-        </TabsContent>
-        <TabsContent value="shared-files">
-          <h2 className="text-2xl font-bold mb-4">Files Shared with Me</h2>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {renderFileCards(files)}
-          </div>
-        </TabsContent>
-      </Tabs>
-    </PrimaryLayout>
+          <UploadFileModal fetchData={getFiles} />
+        </div>
+        <div className="flex flex-wrap gap-4">{renderFileCards(files)}</div>
+      </TabsContent>
+      <TabsContent value="shared-files" className="space-y-2 py-2">
+        <h2 className="text-2xl font-bold mb-4">Shared with Me</h2>
+        <div className="flex flex-wrap gap-4">{renderFileCards(files)}</div>
+      </TabsContent>
+    </Tabs>
   );
 };
 

@@ -21,3 +21,19 @@ export type TDriveAccess = {
   owner: string;
   role: "admin" | "editor" | "viewer";
 };
+
+export type TLoggedInUser = {
+  email: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  drives?: TDriveAccess[];
+  drive: string | null;
+  isMfaEnabled: boolean;
+};
+
+export type TAuthState = {
+  auth: {
+    user: TLoggedInUser | null;
+  };
+};

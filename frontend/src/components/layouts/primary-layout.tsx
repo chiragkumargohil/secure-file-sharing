@@ -12,7 +12,7 @@ const PrimaryLayout = ({ children }: { children: React.ReactNode }) => {
           <Separator orientation="vertical" className="mr-2 h-4" />
         </header>
 
-        <div className="p-4 space-y-4">{children}</div>
+        <div className="p-6 space-y-4">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

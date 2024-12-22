@@ -14,127 +14,100 @@ import {
 } from "./pages";
 import { Toaster } from "./components/ui/sonner";
 import { useAuth } from "./hooks/use-auth";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import usersApi from "./apis/users.api";
 import { useSelector } from "react-redux";
 import ForgotPasswordPage from "./pages/forgot-password";
 import ResetPasswordPage from "./pages/reset-password";
+import { TAuthState } from "./types";
+import PrimaryLayout from "./components/layouts/primary-layout";
 
 const PrivateRoute = () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { user } = useSelector((state: any) => state.auth);
-
+  const { user } = useSelector((state: TAuthState) => state.auth);
   return user ? <Outlet /> : <Navigate to="/login" />;
 };
 
 const PublicRoute = () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { user } = useSelector((state: any) => state.auth);
-
+  const { user } = useSelector((state: TAuthState) => state.auth);
   return user ? <Navigate to="/" /> : <Outlet />;
 };
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <PrivateRoute />,
-    children: [
-      {
-        path: "/",
-        element: <HomePage />,
-      },
-    ],
-  },
-  {
-    path: "/access",
-    element: <PrivateRoute />,
-    children: [
-      {
-        path: "/access",
-        element: <AccessPage />,
-      },
-    ],
-  },
-  {
-    path: "/profile",
-    element: <PrivateRoute />,
-    children: [
-      {
-        path: "/profile",
-        element: <ProfilePage />,
-      },
-    ],
-  },
-  {
-    path: "/login",
-    element: <PublicRoute />,
-    children: [
-      {
-        path: "/login",
-        element: <LoginPage />,
-      },
-    ],
-  },
-  {
-    path: "/signup",
-    element: <PublicRoute />,
-    children: [
-      {
-        path: "/signup",
-        element: <SignupPage />,
-      },
-    ],
-  },
-  {
-    path: "/forgot-password",
-    element: <PublicRoute />,
-    children: [
-      {
-        path: "/forgot-password",
-        element: <ForgotPasswordPage />,
-      },
-    ],
-  },
-  {
-    path: "/reset-password/:uid/:token",
-    element: <PublicRoute />,
-    children: [
-      {
-        path: "/reset-password/:uid/:token",
-        element: <ResetPasswordPage />,
-      },
-    ],
-  },
-  {
-    path: "/files/public/:uuid",
-    element: <SharedFilePage />,
-  },
-  {
-    path: "*",
-    element: <Navigate to="/" />,
-  },
-]);
-
 const App = () => {
   const { user, login, logout } = useAuth();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user) return;
-
-    const getUser = async () => {
-      // if current url is '/files/public/:uuid' then return
-      if (window.location.pathname.includes("/files/public/")) return;
+    const initializeUser = async () => {
+      // Skip user fetching for public file routes
+      if (window.location.pathname.includes("/files/public/")) {
+        setLoading(false);
+        return;
+      }
 
       try {
         const data = await usersApi.userProfile();
         login(data);
       } catch {
         logout();
+      } finally {
+        setLoading(false);
       }
     };
 
-    getUser();
+    if (!user) {
+      initializeUser();
+    } else {
+      setLoading(false);
+    }
   }, [user]);
+
+  if (loading) return null; // Prevent rendering until user state is initialized
+
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: (
+        <PrimaryLayout>
+          <PrivateRoute />
+        </PrimaryLayout>
+      ),
+      children: [
+        { path: "/", element: <HomePage /> },
+        { path: "/access", element: <AccessPage /> },
+        { path: "/profile", element: <ProfilePage /> },
+      ],
+    },
+    {
+      path: "/login",
+      element: <PublicRoute />,
+      children: [{ path: "/login", element: <LoginPage /> }],
+    },
+    {
+      path: "/signup",
+      element: <PublicRoute />,
+      children: [{ path: "/signup", element: <SignupPage /> }],
+    },
+    {
+      path: "/forgot-password",
+      element: <PublicRoute />,
+      children: [{ path: "/forgot-password", element: <ForgotPasswordPage /> }],
+    },
+    {
+      path: "/reset-password/:uid/:token",
+      element: <PublicRoute />,
+      children: [
+        { path: "/reset-password/:uid/:token", element: <ResetPasswordPage /> },
+      ],
+    },
+    {
+      path: "/files/public/:uuid",
+      element: <SharedFilePage />,
+    },
+    {
+      path: "*",
+      element: <Navigate to="/" />,
+    },
+  ]);
 
   return (
     <>

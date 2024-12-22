@@ -114,7 +114,15 @@ const App = () => {
   return (
     <>
       <RouterProvider router={router} />
-      <Toaster />
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          style: {
+            background: "var(--background)",
+            color: "var(--foreground)",
+          },
+        }}
+      />
     </>
   );
 };

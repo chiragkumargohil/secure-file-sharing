@@ -7,6 +7,8 @@ from files.serializers import SharedFileSerializer
 from middleware.role_accessibility import role_accessibility
 from middleware.skip_csrf import CSRFExemptSessionAuthentication
 from .serializers import GetSharedFilesSerializer
+from common.utils.send_email import send_email
+from django.conf import settings
 
 @authentication_classes([CSRFExemptSessionAuthentication])
 class SharedFileView(APIView):
@@ -43,6 +45,14 @@ class SharedFileView(APIView):
             sender_user=request.owner,
             shared_by=request.user
           )
+          
+          # send an email to the user
+          send_email(
+            "File Shared",
+            f"A file has been shared with you by {request.owner.email}. You can access it by logging in to the app. {settings.FRONTEND_URL}",
+            [receiver_email],
+          )
+          
     
       # delete the records that are not in the new data
       SharedFile.objects.filter(file=file).exclude(receiver_email__in=[data.get('email') for data in new_data]).delete()

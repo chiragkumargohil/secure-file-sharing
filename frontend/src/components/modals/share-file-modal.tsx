@@ -21,6 +21,9 @@ import {
 import { X } from "lucide-react";
 import "react-datepicker/dist/react-datepicker.css";
 import resourcesApi from "@/apis/resources.api";
+import { toast } from "sonner";
+import { isValidEmail } from "@/lib/functions";
+import useAuth from "@/hooks/use-auth";
 
 interface ShareSettingsModalProps {
   id: string;
@@ -40,11 +43,14 @@ interface SharedUser {
 }
 
 export function ShareFileModal({ id, open, onClose }: ShareSettingsModalProps) {
+  const { user } = useAuth();
+
   const [sharedWith, setSharedWith] = useState<SharedUser[]>([]);
   const [newEmail, setNewEmail] = useState("");
   const [newAccessType, setNewAccessType] = useState<AccessType>(
     "view" as AccessType
   );
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -67,18 +73,41 @@ export function ShareFileModal({ id, open, onClose }: ShareSettingsModalProps) {
   }, [open]);
 
   const handleSubmit = async () => {
-    await resourcesApi.shareFile(id, {
-      data: sharedWith.map((user) => {
-        return {
-          email: user.email,
-          access_type: user.accessType,
-        };
-      }),
-    });
-    onClose();
+    try {
+      await resourcesApi.shareFile(id, {
+        data: sharedWith.map((user) => {
+          return {
+            email: user.email,
+            access_type: user.accessType,
+          };
+        }),
+      });
+      toast.success("Changes saved successfully");
+      onClose();
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to share file");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const addSharedUser = () => {
+    if (!newEmail) {
+      toast.error("Please enter an email");
+      return;
+    }
+
+    if (!isValidEmail(newEmail)) {
+      toast.error("Please enter a valid email");
+      return;
+    }
+
+    if (newEmail === user?.email) {
+      toast.error("You cannot share with yourself");
+      return;
+    }
+
     if (newEmail && !sharedWith.some((user) => user.email === newEmail)) {
       setSharedWith([
         ...sharedWith,
@@ -170,7 +199,7 @@ export function ShareFileModal({ id, open, onClose }: ShareSettingsModalProps) {
           )}
         </div>
         <DialogFooter>
-          <Button type="submit" onClick={handleSubmit}>
+          <Button type="submit" onClick={handleSubmit} disabled={isLoading}>
             Save changes
           </Button>
         </DialogFooter>

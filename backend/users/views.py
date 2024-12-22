@@ -24,6 +24,7 @@ from django.http import FileResponse
 from django.core.files import File
 from middleware.role_accessibility import role_accessibility
 from common.utils.otp_utils import send_otp, verify_otp
+from common.utils.send_email import send_email
 
 User = get_user_model()
 
@@ -375,6 +376,12 @@ class DriveAccessView(APIView):
             role = request.data.get('role')
             
             DriveAccess.objects.update_or_create(owner=owner, receiver_email=email, defaults={'role': role})
+            
+            send_email(
+                subject="Access Granted",
+                message=f"You have been granted access to the drive of {owner.email}. Login to {settings.FRONTEND_URL} to access your drive.",
+                recipient_list=[email],
+            )
             
             return Response({"message": "Access granted successfully"})
         except Exception as e:

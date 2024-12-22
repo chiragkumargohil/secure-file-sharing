@@ -13,6 +13,8 @@ import Modal from "./modal";
 import { TUserAccess } from "@/types";
 import usersApi from "@/apis/users.api";
 import { toast } from "sonner";
+import { isValidEmail } from "@/lib/functions";
+import useAuth from "@/hooks/use-auth";
 
 type Props = {
   open: boolean;
@@ -21,13 +23,31 @@ type Props = {
 };
 
 const AddUserAccessModal = ({ open, setOpen, onUserAdded }: Props) => {
+  const { user } = useAuth();
   const [newUser, setNewUser] = useState({
     email: "",
     role: "viewer" as TUserAccess["role"],
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   const addUser = async () => {
+    if (!newUser.email) {
+      toast.error("Please enter an email");
+      return;
+    }
+
+    if (!isValidEmail(newUser.email)) {
+      toast.error("Please enter a valid email");
+      return;
+    }
+
+    if (user?.email === newUser.email) {
+      toast.error("You can't add yourself");
+      return;
+    }
+
     try {
+      setIsLoading(true);
       await usersApi.upsertDriveAccess(newUser.email, { role: newUser.role });
       onUserAdded(newUser);
       setNewUser({ email: "", role: "viewer" });
@@ -36,6 +56,8 @@ const AddUserAccessModal = ({ open, setOpen, onUserAdded }: Props) => {
     } catch (error) {
       console.error(error);
       toast.error("Failed to add user");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -45,7 +67,9 @@ const AddUserAccessModal = ({ open, setOpen, onUserAdded }: Props) => {
         <Button variant="outline" onClick={() => setOpen(false)}>
           Cancel
         </Button>
-        <Button onClick={addUser}>Add User</Button>
+        <Button onClick={addUser} disabled={isLoading}>
+          Add User
+        </Button>
       </div>
     );
   };

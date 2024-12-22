@@ -8,6 +8,8 @@ from django.shortcuts import get_object_or_404
 from files.models import File
 from rest_framework.decorators import authentication_classes
 from middleware.skip_csrf import CSRFExemptSessionAuthentication
+from common.utils.file_encryption import decrypt_file
+from django.core.files.base import ContentFile
 
 class PublicFileView(APIView):
   def get(self, request, file_uuid):
@@ -29,7 +31,26 @@ class PublicFileView(APIView):
       if not is_valid:
         return Response({"error": "Link has expired"}, status=status.HTTP_400_BAD_REQUEST)
       
-      response = FileResponse(public_file.file.file, as_attachment=True, filename=public_file.file.filename)
+      file = public_file.file
+
+      # Decrypt the file
+      with open(file.file.path, 'rb') as f:
+          ciphertext = f.read()
+
+      decrypted_data = decrypt_file(
+          ciphertext,
+          file.encryption_key,
+          file.encryption_iv,
+          file.encryption_tag
+      )
+      
+      file.file.close()
+      
+      filename = file.filename
+      if filename.endswith('.enc'):
+          filename = filename[:-4]
+      
+      response = FileResponse(ContentFile(decrypted_data), as_attachment=True, filename=filename)
       return response
     except PublicFile.DoesNotExist:
       return Response({"error": "Link not found"}, status=status.HTTP_404_NOT_FOUND)
@@ -78,7 +99,7 @@ class PublicFileSettingsView(APIView):
       # Check if the file is already shared
       public_file = PublicFile.objects.update_or_create(file=file, defaults={'is_active': is_active, 'expiration_date': expiration_date})
       
-      return Response({"id": public_file[0]}, status=status.HTTP_200_OK)
+      return Response({"id": public_file[0].uuid}, status=status.HTTP_200_OK)
     except File.DoesNotExist:
       return Response({"error": "File not found"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:

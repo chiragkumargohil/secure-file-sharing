@@ -35,5 +35,4 @@ class AccessControlMixin:
             
           return super().dispatch(request, *args, **kwargs)
         except Exception as e:
-          print('error', e)
           return JsonResponse({"error": "Something went wrong", "message": str(e)}, status=500)

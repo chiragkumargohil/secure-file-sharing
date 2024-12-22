@@ -8,7 +8,8 @@ from django.conf import settings
 from .serializers import UploadSerializer, FileSerializer
 from middleware.role_based_access import AccessControlMixin
 from middleware.skip_csrf import CSRFExemptSessionAuthentication
-from django.utils.decorators import method_decorator
+from common.utils.file_encryption import decrypt_file
+from django.core.files.base import ContentFile
 
 User = settings.AUTH_USER_MODEL
 
@@ -112,8 +113,25 @@ class DownloadFileView(APIView):
       if str(file.owner) != str(request.user):
         return Response({"error": "You do not have permission to download this file"}, status=status.HTTP_403_FORBIDDEN)
       
+      # Decrypt the file
+      with open(file.file.path, 'rb') as f:
+          ciphertext = f.read()
+
+      decrypted_data = decrypt_file(
+          ciphertext,
+          file.encryption_key,
+          file.encryption_iv,
+          file.encryption_tag
+      )
+      
+      file.file.close()
+      
+      filename = file.filename
+      if filename.endswith('.enc'):
+          filename = filename[:-4]
+      
       # Return the file response
-      return FileResponse(file.file, as_attachment=True, filename=file.filename)
+      return FileResponse(ContentFile(decrypted_data), as_attachment=True, filename=filename)
     except File.DoesNotExist:
       return Response({"error": "File not found"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:

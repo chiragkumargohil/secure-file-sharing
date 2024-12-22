@@ -25,6 +25,10 @@ const usersApi = {
     const response = await api.put("users/profile/", data);
     return response.data;
   },
+  getMFAQR: async () => {
+    const response = await api.get("users/profile/mfa/qr-code/");
+    return response;
+  },
   forgotPassword: async (email: string) => {
     const response = await api.post("users/forgot-password/", { email });
     return response.data;

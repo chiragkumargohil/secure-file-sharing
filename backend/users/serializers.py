@@ -14,7 +14,7 @@ class LoginSerializer(serializers.Serializer):
 class UpdateUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name']
+        fields = ['first_name', 'last_name', 'is_mfa_enabled']
 
     def validate_email(self, value):
         """Restrict updating email."""
@@ -35,7 +35,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     selected_drive = serializers.PrimaryKeyRelatedField(queryset=DriveAccess.objects.all())
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'last_name', 'selected_drive']
+        fields = ['username', 'email', 'first_name', 'last_name', 'selected_drive', 'is_mfa_enabled']
 
 class DriveAccessListSerializer(serializers.ModelSerializer):
     class Meta:

@@ -18,6 +18,10 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+import qrcode
+from io import BytesIO
+from django.http import FileResponse
+from django.core.files import File
 
 User = get_user_model()
 
@@ -73,13 +77,6 @@ class UserRegisterView(APIView):
           user.set_password(password)  # Ensures Django stores the password securely
           user.save()
 
-          # Generate QR code for MFA setup
-          # otp_uri = pyotp.TOTP(mfa_secret).provisioning_uri(name=email, issuer_name="SecureFileSharingApp")
-          # qr = qrcode.make(otp_uri)
-          # buffer = BytesIO()
-          # qr.save(buffer, format="PNG")
-          # qr_image = buffer.getvalue()
-
           return Response(
               {"message": "User created successfully", "mfa_secret": mfa_secret},
               status=status.HTTP_201_CREATED
@@ -116,17 +113,38 @@ class UserLoginView(APIView):
 
         email = request.data.get("email")
         password = request.data.get("password")
-        # mfa_code = request.data.get("mfa_code")
+        mfa_code = request.data.get("mfa_code")
 
         if not email or not password:
             return Response({"error": "All fields are required"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             user = User.objects.get(email=email)
+            serialized_user = ProfileSerializer(user).data
             if not check_password(password, user.password):
                 return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
             
-            response = Response({"message": "Login successful", "user": {"email": user.email, "username": user.username, "first_name": user.first_name, "last_name": user.last_name}}, status=status.HTTP_200_OK)
+            if user.is_mfa_enabled:
+                if not pyotp.TOTP(user.mfa_secret).verify(mfa_code):
+                    return Response({"error": "Invalid MFA code"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # fetch the drives user has access to
+            drives = DriveAccess.objects.filter(receiver_email=serialized_user['email'])
+            drives = DriveAccessSerializer(drives, many=True).data
+            drives = [{'id': drive['id'], 'role': drive['role'], 'owner': drive['owner']['email']} for drive in drives]
+            
+            # Return user profile data
+            data = {
+                'username': serialized_user['username'],
+                'email': serialized_user['email'],
+                'first_name': serialized_user['first_name'],
+                'last_name': serialized_user['last_name'],
+                'drive': serialized_user['selected_drive'],
+                'is_mfa_enabled': serialized_user['is_mfa_enabled'],
+                'drives': drives or [],
+            }
+            
+            response = Response({"message": "Login successful", "user": data}, status=status.HTTP_200_OK)
             # get tokens
             tokens = get_tokens_for_user(user)
             
@@ -212,6 +230,7 @@ class UserProfileView(APIView):
                 'first_name': user['first_name'],
                 'last_name': user['last_name'],
                 'drive': user['selected_drive'],
+                'is_mfa_enabled': user['is_mfa_enabled'],
                 'drives': drives or [],
             }
             
@@ -228,6 +247,27 @@ class UserProfileView(APIView):
                 serializer.save()
                 return Response({"message": "Profile updated successfully"})
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": "Something went wrong", "message": str(e)}, status=500)
+
+class MFAQRCodeView(APIView):
+    def get(self, request):
+        try:
+            user = request.user
+            totp = pyotp.TOTP(user.mfa_secret)
+            qr_data = totp.provisioning_uri(
+                user.email, 
+                issuer_name="CG Drive",
+            )
+            # Generate QR code
+            qr = qrcode.make(qr_data)
+            buffer = BytesIO()
+            qr.save(buffer, format="PNG")
+            buffer.seek(0)
+            
+            qr_image = File(buffer, name="qr_code.png")
+            
+            return FileResponse(qr_image, as_attachment=True, filename="qr_code.png")
         except Exception as e:
             return Response({"error": "Something went wrong", "message": str(e)}, status=500)
 

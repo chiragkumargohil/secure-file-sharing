@@ -45,6 +45,15 @@ const LoginForm = ({ className, ...props }: LoginFormProps) => {
                 </div>
                 <Input id="password" name="password" type="password" required />
               </div>
+              <div className="grid gap-2">
+                <Label htmlFor="email">MFA Code</Label>
+                <Input
+                  id="mfa-code"
+                  name="mfa_code"
+                  placeholder="123456"
+                  required
+                />
+              </div>
               <Button type="submit" className="w-full">
                 Login
               </Button>

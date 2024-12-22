@@ -17,6 +17,7 @@ export function useAuth() {
         lastName: user.last_name,
         drives: Array.isArray(user.drives) ? user.drives : [],
         drive: user.drive ?? null,
+        isMfaEnabled: user.is_mfa_enabled ?? false,
       })
     );
   };

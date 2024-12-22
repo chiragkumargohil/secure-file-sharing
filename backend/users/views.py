@@ -174,12 +174,6 @@ class UserLoginView(APIView):
                 httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
                 # samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
             )
-
-            # Verify the password
-            # Verify MFA code
-            # totp = pyotp.TOTP(user.mfa_secret)
-            # if not totp.verify(mfa_code):
-            #     return Response({"error": "Invalid MFA code"}, status=status.HTTP_400_BAD_REQUEST)
             
             return response
         except User.DoesNotExist:

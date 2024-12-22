@@ -20,6 +20,7 @@ const DeleteUserAccessModal = ({ open, setOpen, user, onAction }: Props) => {
       setOpen(false);
     } catch (error) {
       console.error(error);
+      toast.error("Failed to delete user");
     }
   };
 

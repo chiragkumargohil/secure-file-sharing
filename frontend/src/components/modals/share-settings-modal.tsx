@@ -62,7 +62,7 @@ const ShareSettingsModal = ({ id, open, onClose }: ShareSettingsModalProps) => {
       if (data && data.id) {
         setLinkId(data.id);
       }
-      toast.success("Settings saved");
+      toast.success("Settings saved successfully");
     } catch (error) {
       console.error(error);
       toast.error("Failed to generate link");

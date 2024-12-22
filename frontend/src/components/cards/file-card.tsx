@@ -24,6 +24,7 @@ import resourcesApi from "@/apis/resources.api";
 import ShareSettingsModal from "../modals/share-settings-modal";
 import { ShareFileModal } from "../modals/share-file-modal";
 import FilePreviewModal from "../modals/file-preview-modal";
+import { toast } from "sonner";
 
 interface FileCardProps {
   id: string;
@@ -78,6 +79,7 @@ const FileCard = ({
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error(error);
+      toast.error("Failed to download file");
     }
   };
 
@@ -85,8 +87,10 @@ const FileCard = ({
     try {
       await resourcesApi.deleteFile(id);
       onDelete();
+      toast.success("File deleted successfully");
     } catch (error) {
       console.error(error);
+      toast.error("Failed to delete file");
     }
   };
 

@@ -82,12 +82,13 @@ const UploadFileModal = ({ fetchData }: Props) => {
 
     try {
       await resourcesApi.uploadFile(formData);
-      toast.success("File uploaded successfully");
+      toast.success("Files uploaded successfully");
       fetchData();
       setIsOpen(false);
       setFiles([]);
     } catch (error) {
       console.error(error);
+      toast.error("Failed to upload files");
     }
   };
 

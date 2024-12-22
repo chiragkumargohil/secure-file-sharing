@@ -23,9 +23,11 @@ const LoginPage = () => {
       login(data?.user);
 
       navigate("/");
-    } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       console.error(error);
-      toast.error("Login failed");
+      const message = error?.response?.data?.error;
+      toast.error(message || "Login failed");
     }
   };
 

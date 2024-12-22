@@ -35,6 +35,7 @@ const AddUserAccessModal = ({ open, setOpen, onUserAdded }: Props) => {
       setOpen(false);
     } catch (error) {
       console.error(error);
+      toast.error("Failed to add user");
     }
   };
 

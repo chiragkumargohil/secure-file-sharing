@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
+import loginImage from "../../assets/login.svg";
 
 type SignupFormProps = {
   className?: string;
@@ -17,9 +18,9 @@ const SignupForm = ({ className, ...props }: SignupFormProps) => {
           <form className="p-6 md:p-8" {...props}>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
-                <h1 className="text-2xl font-bold">Welcome back</h1>
+                <h1 className="text-2xl font-bold">Welcome to CG Drive</h1>
                 <p className="text-balance text-muted-foreground">
-                  Login to your CG Drive account
+                  Signup to your CG Drive account
                 </p>
               </div>
               <div className="grid gap-2">
@@ -53,9 +54,9 @@ const SignupForm = ({ className, ...props }: SignupFormProps) => {
           </form>
           <div className="relative hidden bg-muted md:block">
             <img
-              src="/placeholder.svg"
-              alt="Image"
-              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+              src={loginImage}
+              alt="Signup"
+              className="absolute inset-0 h-full w-full object-contain dark:brightness-[0.2] dark:grayscale"
             />
           </div>
         </CardContent>

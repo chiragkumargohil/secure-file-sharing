@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
+import loginImage from "../../assets/login.svg";
 
 type LoginFormProps = {
   className?: string;
@@ -47,11 +48,7 @@ const LoginForm = ({ className, ...props }: LoginFormProps) => {
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">MFA Code</Label>
-                <Input
-                  id="mfa-code"
-                  name="mfa_code"
-                  placeholder="123456"
-                />
+                <Input id="mfa-code" name="mfa_code" placeholder="123456" />
               </div>
               <Button type="submit" className="w-full">
                 Login
@@ -66,9 +63,9 @@ const LoginForm = ({ className, ...props }: LoginFormProps) => {
           </form>
           <div className="relative hidden bg-muted md:block">
             <img
-              src="/placeholder.svg"
-              alt="Image"
-              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+              src={loginImage}
+              alt="Login"
+              className="absolute inset-0 h-full w-full object-contain dark:brightness-[0.2] dark:grayscale"
             />
           </div>
         </CardContent>

@@ -12,6 +12,7 @@ import { Button } from "../ui";
 import usersApi from "@/apis/users.api";
 import { useAuth } from "@/hooks/use-auth";
 import { useSelector } from "react-redux";
+import { toast } from "sonner";
 
 // This is sample data.
 const data = {
@@ -63,8 +64,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             try {
               await usersApi.logout();
               logout();
+              toast.success("Logout successful");
             } catch (error) {
               console.error(error);
+              toast.error("Logout failed");
             }
           }}
         >

@@ -31,6 +31,7 @@ const EditUserAccessModal = ({ open, setOpen, user, onUserUpdated }: Props) => {
       setOpen(false);
     } catch (error) {
       console.error(error);
+      toast.error("Failed to update user role");
     }
   };
 

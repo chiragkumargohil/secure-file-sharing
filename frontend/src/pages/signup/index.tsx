@@ -20,9 +20,11 @@ const SignupPage = () => {
       toast.success("Account created successfully");
 
       navigate("/login");
-    } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       console.error(error);
-      toast.error("Account creation failed");
+      const message = error?.response?.data?.error;
+      toast.error(message || "Account creation failed");
     }
   };
 

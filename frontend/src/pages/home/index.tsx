@@ -75,36 +75,43 @@ const Home = () => {
     ));
   };
 
-  if (isLoading) {
-    return <Loader />;
-  }
-
   return (
-    <Tabs defaultValue="my-files" onValueChange={setActiveTab}>
-      {canViewSharedFiles && (
+    <>
+      {isLoading && (
+        <div
+          id="loader-overlay"
+          className="fixed inset-0 bg-gray-100 bg-opacity-50 flex items-center justify-center z-50"
+        >
+          <Loader />
+          {/* <div class="loader border-t-4 border-blue-500 border-solid rounded-full w-16 h-16 animate-spin"></div> */}
+        </div>
+      )}
+      <Tabs defaultValue="my-files" onValueChange={setActiveTab}>
         <TabsList className="w-full justify-start">
           <TabsTrigger value="my-files" className="py-2">
             My Files
           </TabsTrigger>
-          <TabsTrigger value="shared-files" className="py-2">
+          <TabsTrigger
+            value="shared-files"
+            className="py-2"
+            disabled={!canViewSharedFiles}
+          >
             Shared with Me
           </TabsTrigger>
         </TabsList>
-      )}
-      <TabsContent value="my-files" className="space-y-2 py-2">
-        <div className="flex items-center justify-between gap-2">
-          <h2 className="text-2xl font-bold mb-4">My Files</h2>
-          {canUpload && <UploadFileModal fetchData={getFiles} />}
-        </div>
-        <div className="flex flex-wrap gap-4">{renderFileCards(files)}</div>
-      </TabsContent>
-      {canViewSharedFiles && (
+        <TabsContent value="my-files" className="space-y-2 py-2">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-2xl font-bold mb-4">My Files</h2>
+            {canUpload && <UploadFileModal fetchData={getFiles} />}
+          </div>
+          <div className="flex flex-wrap gap-4">{renderFileCards(files)}</div>
+        </TabsContent>
         <TabsContent value="shared-files" className="space-y-2 py-2">
           <h2 className="text-2xl font-bold mb-4">Shared with Me</h2>
           <div className="flex flex-wrap gap-4">{renderFileCards(files)}</div>
         </TabsContent>
-      )}
-    </Tabs>
+      </Tabs>
+    </>
   );
 };
 

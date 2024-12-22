@@ -126,6 +126,14 @@ class UserLoginView(APIView):
                 return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
             
             if user.is_mfa_enabled:
+                print(settings.EMAIL_HOST_USER)
+                send_mail(
+                    'MFA Code',
+                    f'Your MFA code is: {mfa_code}',
+                    settings.EMAIL_HOST_USER,
+                    [user.email],
+                    fail_silently=False
+                )
                 if not pyotp.TOTP(user.mfa_secret).verify(mfa_code):
                     return Response({"error": "Invalid MFA code"}, status=status.HTTP_400_BAD_REQUEST)
             

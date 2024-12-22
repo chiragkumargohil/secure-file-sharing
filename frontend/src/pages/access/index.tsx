@@ -14,33 +14,47 @@ import { Trash2, Edit2, UserPlus } from "lucide-react";
 import AddUserAccessModal from "@/components/modals/add-user-access-modal";
 import EditUserAccessModal from "@/components/modals/edit-user-access-modal";
 import DeleteUserAccessModal from "@/components/modals/delete-user-access-modal";
+import Error from "@/components/error";
+import useAsyncCall from "@/hooks/use-async-call";
+import Loader from "@/components/loader";
 
 const AccessPage = () => {
   const [users, setUsers] = useState<TUserAccess[]>([]);
   const [showAddUser, setShowAddUser] = useState(false);
   const [editingUser, setEditingUser] = useState<TUserAccess | null>(null);
   const [deletingUser, setDeletingUser] = useState<TUserAccess | null>(null);
-
-  const getUsers = async () => {
-    try {
-      const data = await usersApi.getDriveAccessEmails();
-      setUsers(data.users || []);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  const {
+    isLoading,
+    error,
+    data,
+    call: getUsers,
+  } = useAsyncCall(usersApi.getDriveAccessEmails);
 
   useEffect(() => {
     getUsers();
   }, []);
 
+  useEffect(() => {
+    if (data) {
+      setUsers(Array.isArray(data.users) ? data.users : []);
+    }
+  }, [data]);
+
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  if (error) {
+    return <Error type={error} />;
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold">User Access</h2>
+        <h2 className="text-2xl font-semibold">User access</h2>
         <Button onClick={() => setShowAddUser(true)}>
           <UserPlus className="mr-2 h-4 w-4" />
-          Add New User
+          Add new user
         </Button>
       </div>
 
@@ -53,8 +67,8 @@ const AccessPage = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {users.map((user) => (
-            <TableRow key={user.id}>
+          {users.map((user, index) => (
+            <TableRow key={index}>
               <TableCell>{user.email}</TableCell>
               <TableCell>{user.role}</TableCell>
               <TableCell>

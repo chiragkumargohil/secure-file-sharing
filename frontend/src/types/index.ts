@@ -29,6 +29,7 @@ export type TLoggedInUser = {
   lastName: string;
   drives?: TDriveAccess[];
   drive: string | null;
+  role: "admin" | "editor" | "viewer";
   isMfaEnabled: boolean;
 };
 
@@ -36,4 +37,9 @@ export type TAuthState = {
   auth: {
     user: TLoggedInUser | null;
   };
+};
+
+export type TError = {
+  type: "no-access" | "not-found" | "server-error" | "file-not-found";
+  message?: string;
 };

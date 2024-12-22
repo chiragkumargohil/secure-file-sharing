@@ -1,17 +1,20 @@
 // loader.tsx
 
 import { cn } from "../../lib/utils";
-import { Loader2 } from "lucide-react";
 
 const Loader = ({ className }: { className?: string }) => {
   return (
     <div
       className={cn(
-        "flex h-full w-full items-center justify-center",
+        "flex h-screen w-full items-center justify-center",
         className
       )}
     >
-      <Loader2 className="animate-spin" />
+      <div className="flex items-center space-x-2">
+        <div className="h-4 w-4 animate-bounce rounded-full bg-primary"></div>
+        <div className="h-4 w-4 animate-bounce rounded-full bg-primary"></div>
+        <div className="h-4 w-4 animate-bounce rounded-full bg-primary"></div>
+      </div>
     </div>
   );
 };

@@ -21,6 +21,7 @@ import ForgotPasswordPage from "./pages/forgot-password";
 import ResetPasswordPage from "./pages/reset-password";
 import { TAuthState } from "./types";
 import PrimaryLayout from "./components/layouts/primary-layout";
+import Loader from "./components/loader";
 
 const PrivateRoute = () => {
   const { user } = useSelector((state: TAuthState) => state.auth);
@@ -62,7 +63,7 @@ const App = () => {
     }
   }, [user]);
 
-  if (loading) return null; // Prevent rendering until user state is initialized
+  if (loading) return <Loader />; // Prevent rendering until user state is initialized
 
   const router = createBrowserRouter([
     {

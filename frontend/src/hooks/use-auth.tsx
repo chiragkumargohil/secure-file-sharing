@@ -18,6 +18,7 @@ export function useAuth() {
         drives: Array.isArray(user.drives) ? user.drives : [],
         drive: user.drive ?? null,
         isMfaEnabled: user.is_mfa_enabled ?? false,
+        role: user.role,
       })
     );
   };

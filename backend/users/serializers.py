@@ -33,6 +33,7 @@ class DriveAccessSerializer(serializers.ModelSerializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     selected_drive = serializers.PrimaryKeyRelatedField(queryset=DriveAccess.objects.all())
+
     class Meta:
         model = User
         fields = ['username', 'email', 'first_name', 'last_name', 'selected_drive', 'is_mfa_enabled']

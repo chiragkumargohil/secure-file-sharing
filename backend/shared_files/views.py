@@ -2,10 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import File, SharedFile
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import authentication_classes
-from rest_framework.serializers import ModelSerializer
-from files.serializers import FileSerializer
+from files.serializers import SharedFileSerializer
 from middleware.role_accessibility import role_accessibility
 from middleware.skip_csrf import CSRFExemptSessionAuthentication
 from .serializers import GetSharedFilesSerializer
@@ -87,11 +85,8 @@ class SharedFilesView(APIView):
   def get(self, request):
     try:
       shared_files = SharedFile.objects.filter(receiver_email=request.owner.email)
-      
-      shared_files = File.objects.filter(id__in=[file.file_id for file in shared_files])
-      
-      serializer = FileSerializer(shared_files, many=True)
+      shared_files = SharedFileSerializer(shared_files, many=True).data
 
-      return Response({"files": serializer.data}, status=status.HTTP_200_OK)
+      return Response({"files": shared_files}, status=status.HTTP_200_OK)
     except Exception as e:
       return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

@@ -105,7 +105,7 @@ export function ShareFileModal({ id, open, onClose }: ShareSettingsModalProps) {
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Share Settings</DialogTitle>
+          <DialogTitle>Share with emails</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="flex flex-col gap-2">
@@ -132,40 +132,42 @@ export function ShareFileModal({ id, open, onClose }: ShareSettingsModalProps) {
               <Button onClick={addSharedUser}>Add</Button>
             </div>
           </div>
-          <div className="flex flex-col gap-2">
-            <Label>Shared with</Label>
-            {sharedWith.map((user) => (
-              <div
-                key={user.email}
-                className="flex items-center justify-between gap-2 bg-secondary p-2 rounded-md"
-              >
-                <span>{user.email}</span>
-                <div className="flex items-center gap-2">
-                  <Select
-                    value={user.accessType}
-                    onValueChange={(value: AccessType) =>
-                      updateAccessType(user.email, value)
-                    }
-                  >
-                    <SelectTrigger className="w-[100px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="view">View</SelectItem>
-                      <SelectItem value="download">Download</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeSharedUser(user.email)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
+          {sharedWith.length > 0 && (
+            <div className="flex flex-col gap-2">
+              <Label>Shared with</Label>
+              {sharedWith.map((user) => (
+                <div
+                  key={user.email}
+                  className="flex items-center justify-between gap-2 bg-secondary p-2 rounded-md"
+                >
+                  <span>{user.email}</span>
+                  <div className="flex items-center gap-2">
+                    <Select
+                      value={user.accessType}
+                      onValueChange={(value: AccessType) =>
+                        updateAccessType(user.email, value)
+                      }
+                    >
+                      <SelectTrigger className="w-[100px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="view">View</SelectItem>
+                        <SelectItem value="download">Download</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeSharedUser(user.email)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
         <DialogFooter>
           <Button type="submit" onClick={handleSubmit}>

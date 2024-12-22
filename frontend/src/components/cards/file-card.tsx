@@ -30,16 +30,32 @@ interface FileCardProps {
   name: string;
   size: number;
   updatedAt: Date;
+  accessType?: "download" | "view";
   onDelete: () => void;
+  hideActions?: boolean;
+  viewButtons?: {
+    download: boolean;
+    view: boolean;
+    share: boolean;
+    delete: boolean;
+  };
 }
 
-export function FileCard({
+const FileCard = ({
   id,
   name,
   size,
   updatedAt,
   onDelete,
-}: FileCardProps) {
+  accessType = "download",
+  viewButtons = {
+    download: true,
+    view: true,
+    share: true,
+    delete: true,
+  },
+  hideActions = false,
+}: FileCardProps) => {
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isShareSpecificDialogOpen, setIsShareSpecificDialogOpen] =
@@ -49,7 +65,6 @@ export function FileCard({
   const onDownload = async () => {
     try {
       const response = await resourcesApi.downloadFile(id);
-      console.log(response);
       const blob = new Blob([response.data], {
         type: response.headers["content-type"],
       });
@@ -100,24 +115,56 @@ export function FileCard({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setIsViewFileDialogOpen(true)}>
+              <DropdownMenuItem
+                onClick={() => setIsViewFileDialogOpen(true)}
+                disabled={!viewButtons.view}
+                className="cursor-pointer"
+                title={!viewButtons.view ? "You don't have permission" : ""}
+              >
                 View file
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={onDownload}>Download</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setIsShareDialogOpen(true)}>
-                Share publicly
-              </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => setIsShareSpecificDialogOpen(true)}
+                onClick={onDownload}
+                disabled={!viewButtons.download || accessType === "view"}
+                className="cursor-pointer"
+                title={!viewButtons.download ? "You don't have permission" : ""}
               >
-                Share with specific users
+                Download
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setIsDeleteDialogOpen(true)}
-                className="text-red-600"
-              >
-                Delete
-              </DropdownMenuItem>
+              {!hideActions && (
+                <>
+                  <DropdownMenuItem
+                    onClick={() => setIsShareDialogOpen(true)}
+                    disabled={!viewButtons.share}
+                    className="cursor-pointer"
+                    title={
+                      !viewButtons.share ? "You don't have permission" : ""
+                    }
+                  >
+                    Share publicly
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setIsShareSpecificDialogOpen(true)}
+                    disabled={!viewButtons.share}
+                    className="cursor-pointer"
+                    title={
+                      !viewButtons.share ? "You don't have permission" : ""
+                    }
+                  >
+                    Share with specific users
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setIsDeleteDialogOpen(true)}
+                    className="text-red-600 cursor-pointer"
+                    disabled={!viewButtons.delete}
+                    title={
+                      !viewButtons.delete ? "You don't have permission" : ""
+                    }
+                  >
+                    Delete
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -184,4 +231,6 @@ export function FileCard({
       </AlertDialog>
     </Card>
   );
-}
+};
+
+export default FileCard;

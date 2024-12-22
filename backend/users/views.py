@@ -134,6 +134,11 @@ class UserLoginView(APIView):
             drives = DriveAccessSerializer(drives, many=True).data
             drives = [{'id': drive['id'], 'role': drive['role'], 'owner': drive['owner']['email']} for drive in drives]
             
+            role = 'admin'
+            if serialized_user['selected_drive'] is not None:
+                drive = DriveAccess.objects.get(id=serialized_user['selected_drive'])
+                role = drive.role
+            
             # Return user profile data
             data = {
                 'username': serialized_user['username'],
@@ -143,6 +148,7 @@ class UserLoginView(APIView):
                 'drive': serialized_user['selected_drive'],
                 'is_mfa_enabled': serialized_user['is_mfa_enabled'],
                 'drives': drives or [],
+                'role': role
             }
             
             response = Response({"message": "Login successful", "user": data}, status=status.HTTP_200_OK)
@@ -223,6 +229,11 @@ class UserProfileView(APIView):
             drives = DriveAccess.objects.filter(receiver_email=user['email'])
             drives = DriveAccessSerializer(drives, many=True).data
             drives = [{'id': drive['id'], 'role': drive['role'], 'owner': drive['owner']['email']} for drive in drives]
+            
+            role = 'admin'
+            if user['selected_drive'] is not None:
+                drive = DriveAccess.objects.get(id=user['selected_drive'])
+                role = drive.role
 
             # Return user profile data
             data = {
@@ -233,6 +244,7 @@ class UserProfileView(APIView):
                 'drive': user['selected_drive'],
                 'is_mfa_enabled': user['is_mfa_enabled'],
                 'drives': drives or [],
+                'role': role
             }
             
             return Response(data, status=status.HTTP_200_OK)

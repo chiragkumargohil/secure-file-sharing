@@ -25,9 +25,11 @@ class DriveAccess(models.Model):
     role = models.CharField(max_length=255, choices=ROLES)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    added_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='drive_access_added_by')
 
     class Meta:
         unique_together = ('owner', 'receiver_email')
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.receiver_email

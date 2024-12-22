@@ -22,6 +22,7 @@ import qrcode
 from io import BytesIO
 from django.http import FileResponse
 from django.core.files import File
+from middleware.role_accessibility import role_accessibility
 
 User = get_user_model()
 
@@ -342,6 +343,7 @@ class ResetPasswordConfirmView(APIView):
 # DRIVE ACCESS
 @authentication_classes([CSRFExemptSessionAuthentication])
 class DriveAccessView(APIView):
+    @role_accessibility(['admin'])
     def post(self, request, email):
         """
         Grant access to a user to access the current user's drive.
@@ -354,7 +356,7 @@ class DriveAccessView(APIView):
         """
         
         try:
-            owner = request.user
+            owner = request.owner
             role = request.data.get('role')
             
             DriveAccess.objects.update_or_create(owner=owner, receiver_email=email, defaults={'role': role})
@@ -363,6 +365,7 @@ class DriveAccessView(APIView):
         except Exception as e:
             return Response({"error": "Something went wrong", "message": str(e)}, status=500)
     
+    @role_accessibility(['admin'])
     def delete(self, request, email):
         """
         Revoke drive access for a specified user.
@@ -377,7 +380,7 @@ class DriveAccessView(APIView):
         """
 
         try:
-            owner = request.user
+            owner = request.owner
             
             DriveAccess.objects.filter(owner=owner, receiver_email=email).delete()
             
@@ -388,6 +391,7 @@ class DriveAccessView(APIView):
             return Response({"error": "Something went wrong", "message": str(e)}, status=500)
 
 class DriveAccessListView(APIView):
+    @role_accessibility(['admin'])
     def get(self, request):
         """
         Return a list of users with whom the current user has shared access to their Google Drive.
@@ -396,7 +400,7 @@ class DriveAccessListView(APIView):
             Response: A response object containing a list of users with their respective roles.
         """
         try:
-            owner = request.user
+            owner = request.owner
             users = DriveAccess.objects.filter(owner=owner)
             users = DriveAccessListSerializer(users, many=True).data
             

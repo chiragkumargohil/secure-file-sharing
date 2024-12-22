@@ -46,16 +46,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/* We create a collapsible SidebarGroup for each parent. */}
         {data.navMain.map((item) => (
           <Link to={item.url} key={item.title}>
-            <h3 className="px-3 py-2 text-base font-semibold rounded hover:bg-muted">
-              {item.title}
+            <h3 className="px-3 py-2 text-base font-semibold rounded hover:bg-muted truncate">
+              {item.title === "Profile" ? (
+                <>
+                  Profile <span className="text-xs">({user?.email})</span>
+                </>
+              ) : (
+                item.title
+              )}
             </h3>
           </Link>
         ))}
-        {user && (
-          <div className="px-3 py-2 text-base font-semibold rounded hover:bg-muted">
-            {user.email}
-          </div>
-        )}
         <Button
           className="mt-auto"
           onClick={async () => {

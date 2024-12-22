@@ -33,7 +33,8 @@ const PublicRoute = () => {
 };
 
 const App = () => {
-  const { user, login, logout } = useAuth();
+  const { user } = useSelector((state: TAuthState) => state.auth);
+  const { login, logout } = useAuth();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

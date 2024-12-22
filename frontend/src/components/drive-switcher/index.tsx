@@ -37,6 +37,7 @@ const DriveSwitcher = () => {
           drive: drive?.id ?? null,
         })
       );
+      window.location.reload();
     } catch {
       toast.error("Failed to switch drive");
     }

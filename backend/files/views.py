@@ -6,17 +6,18 @@ from .models import File
 from rest_framework.decorators import authentication_classes
 from django.conf import settings
 from .serializers import UploadSerializer, FileSerializer
-from middleware.role_based_access import AccessControlMixin
 from middleware.skip_csrf import CSRFExemptSessionAuthentication
 from common.utils.file_encryption import decrypt_file
 from django.core.files.base import ContentFile
+from middleware.role_accessibility import role_accessibility
 
 User = settings.AUTH_USER_MODEL
 
 @authentication_classes([CSRFExemptSessionAuthentication])
-class FilesView(AccessControlMixin, APIView):
+class FilesView(APIView):
   serializer_class = UploadSerializer
 
+  @role_accessibility(['admin', 'editor'])
   def post(self, request):
     """
     Upload files to the server.
@@ -34,17 +35,19 @@ class FilesView(AccessControlMixin, APIView):
       # save the files
       for file in files:
         File.objects.create(
-          owner=request.user,
+          owner=request.owner,
           filename=file.name,
           file=file,
           mime_type=file.content_type,
-          size=file.size
+          size=file.size,
+          added_by=request.user
         )
 
       return Response({"message": "Files uploaded successfully"}, status=status.HTTP_200_OK)
     except Exception as e:
       return Response({"error": "Something went wrong", "message": str(e)}, status=500)
   
+  @role_accessibility(['admin', 'editor', 'viewer'])
   def get(self, request):
     """
     Return a list of files uploaded by the current user.
@@ -53,7 +56,7 @@ class FilesView(AccessControlMixin, APIView):
         Response: A response object containing a list of files.
     """
     try:
-      files = File.objects.filter(owner=request.drive_user)
+      files = File.objects.filter(owner=request.owner)
       files = FileSerializer(files, many=True).data
       return Response({"files": files}, status=status.HTTP_200_OK)
     except Exception as e:
@@ -62,6 +65,7 @@ class FilesView(AccessControlMixin, APIView):
 
 @authentication_classes([CSRFExemptSessionAuthentication])
 class FileView(APIView):
+  @role_accessibility(['admin', 'editor'])
   def delete(self, request, file_id):
     """
     Delete a file with the specified file_id.
@@ -77,7 +81,7 @@ class FileView(APIView):
       file = File.objects.get(id=file_id)
 
       # Check if the user has permission to delete the file
-      if str(file.owner) != str(request.user):
+      if str(file.owner) != str(request.owner):
         return Response({"error": "You do not have permission to delete this file"}, status=status.HTTP_403_FORBIDDEN)
       file_path = file.file.path
       # Delete the file from the database
@@ -95,6 +99,7 @@ class FileView(APIView):
       return Response({"error": "Something went wrong", "message": str(e)}, status=500)
 
 class DownloadFileView(APIView):
+  @role_accessibility(['admin', 'editor', 'viewer'])
   def get(self, request, file_id):
     """
     Return a file response with the specified file_id.
@@ -110,7 +115,7 @@ class DownloadFileView(APIView):
       file = File.objects.get(id=file_id)
 
       # Check if the user has permission to download the file
-      if str(file.owner) != str(request.user):
+      if str(file.owner) != str(request.owner):
         return Response({"error": "You do not have permission to download this file"}, status=status.HTTP_403_FORBIDDEN)
       
       # Decrypt the file

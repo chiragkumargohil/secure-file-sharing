@@ -3,13 +3,13 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.http import FileResponse
 from .models import PublicFile
-from django.conf import settings
 from django.shortcuts import get_object_or_404
 from files.models import File
 from rest_framework.decorators import authentication_classes
 from middleware.skip_csrf import CSRFExemptSessionAuthentication
 from common.utils.file_encryption import decrypt_file
 from django.core.files.base import ContentFile
+from middleware.role_accessibility import role_accessibility
 
 class PublicFileView(APIView):
   def get(self, request, file_uuid):
@@ -60,10 +60,15 @@ class PublicFileView(APIView):
 # disable CSRF protection
 @authentication_classes([CSRFExemptSessionAuthentication])
 class PublicFileSettingsView(APIView):
+  @role_accessibility(['admin', 'editor'])
   def get(self, request, file_id):
     try:
       # get the file
       file = get_object_or_404(File, id=file_id)
+      
+      if str(file.owner) != str(request.owner):
+        return Response({"error": "You do not have permission to access this resource"}, status=status.HTTP_403_FORBIDDEN)
+
       # fetch the last shareable link
       shareable_link = PublicFile.objects.filter(file=file).latest('created_at')
       
@@ -74,6 +79,7 @@ class PublicFileSettingsView(APIView):
     except Exception as e:
       return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
   
+  @role_accessibility(['admin', 'editor'])
   def post(self, request, file_id):
     """
     Create / update a public link for a file.
@@ -89,7 +95,7 @@ class PublicFileSettingsView(APIView):
       file = get_object_or_404(File, id=file_id)
 
       # Check if the user has permission to share the file
-      if str(file.owner) != str(request.user):
+      if str(file.owner) != str(request.owner):
         return Response({"error": "You do not have permission to share this file"}, status=status.HTTP_403_FORBIDDEN)
       
       body = request.data
@@ -105,6 +111,8 @@ class PublicFileSettingsView(APIView):
     except Exception as e:
       return Response({"error": "Something went wrong", "message": str(e)}, status=500)
 
+
+  @role_accessibility(['admin', 'editor'])
   def delete(self, request, file_id):
     """
     Delete a public link for a file.
@@ -121,7 +129,7 @@ class PublicFileSettingsView(APIView):
       
       public_file = PublicFile.objects.filter(file=file).latest('created_at')
       
-      if str(file.owner) != str(request.user):
+      if str(file.owner) != str(request.owner):
         return Response({"error": "You do not have permission to delete this file"}, status=status.HTTP_403_FORBIDDEN)
       
       public_file.delete()

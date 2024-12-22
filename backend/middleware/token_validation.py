@@ -2,6 +2,8 @@ import jwt
 from django.http import JsonResponse
 from rest_framework_simplejwt.tokens import AccessToken
 from django.contrib.auth import get_user_model
+from rest_framework import serializers
+from users.models import DriveAccess
 
 User = get_user_model()
 
@@ -17,6 +19,11 @@ ALLOWED_START_WITH_PATH = [
     '/api/users/forgot-password/',
     '/api/users/reset-password/'
 ]
+
+class UserSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = User
+    fields = ['email', 'first_name', 'last_name', 'selected_drive', 'id']
 
 class JWTAuthenticationMiddleware:
     """
@@ -47,6 +54,16 @@ class JWTAuthenticationMiddleware:
                 user_id = decoded_token['user_id']
                 user = User.objects.get(id=user_id)
                 request.user = user
+
+                serialized_user = UserSerializer(user).data
+                selected_drive = serialized_user['selected_drive']
+                request.owner = user # Set default owner
+                request.user.role = 'admin' # Set default role
+                
+                if selected_drive is not None:
+                    drive = DriveAccess.objects.get(id=selected_drive)
+                    request.owner = drive.owner
+                    request.user.role = drive.role
 
             except jwt.ExpiredSignatureError:
                 return JsonResponse({'error': 'Token has expired'}, status=401)

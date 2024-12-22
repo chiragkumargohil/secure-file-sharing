@@ -12,9 +12,11 @@ class SharedFile(models.Model):
   message = models.CharField(max_length=255, null=True, blank=True)
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)
+  shared_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='shared_files_added_by')
   
   class Meta:
     unique_together = ('file', 'receiver_email')
+    ordering = ['-created_at']
 
   def __str__(self):
     return self.receiver_email

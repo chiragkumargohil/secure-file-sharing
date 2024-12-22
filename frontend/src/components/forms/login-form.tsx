@@ -51,7 +51,6 @@ const LoginForm = ({ className, ...props }: LoginFormProps) => {
                   id="mfa-code"
                   name="mfa_code"
                   placeholder="123456"
-                  required
                 />
               </div>
               <Button type="submit" className="w-full">

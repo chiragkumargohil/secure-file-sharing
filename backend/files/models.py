@@ -19,6 +19,10 @@ class File(models.Model):
   encryption_key = models.BinaryField(default=b'') # encryption key
   encryption_iv = models.BinaryField(default=b'') # initialization vector
   encryption_tag = models.BinaryField(default=b'') # GCM tag
+  added_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='files_added_by')
+  
+  class Meta:
+    ordering = ['-created_at']
   
   def save(self, *args, **kwargs):
     file_data = self.file.read()

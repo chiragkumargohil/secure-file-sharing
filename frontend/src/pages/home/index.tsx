@@ -22,6 +22,7 @@ const Home = () => {
       setFiles(data.files || []);
     } catch (error) {
       console.error(error);
+      setFiles([]);
     }
   };
 

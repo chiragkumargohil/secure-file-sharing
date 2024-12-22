@@ -104,7 +104,7 @@ const AccessPage = () => {
           setOpen={setShowAddUser}
           onUserAdded={(user: TUserAccess) => {
             if (!users.find((u) => u.email === user.email)) {
-              setUsers([...users, { email: user.email, role: user.role }]);
+              setUsers([{ email: user.email, role: user.role }, ...users]);
             }
           }}
         />

@@ -10,6 +10,7 @@ from middleware.skip_csrf import CSRFExemptSessionAuthentication
 from common.utils.file_encryption import decrypt_file
 from django.core.files.base import ContentFile
 from middleware.role_accessibility import role_accessibility
+from shared_files.models import SharedFile
 
 User = settings.AUTH_USER_MODEL
 
@@ -99,7 +100,7 @@ class FileView(APIView):
       return Response({"error": "Something went wrong", "message": str(e)}, status=500)
 
 class DownloadFileView(APIView):
-  @role_accessibility(['admin', 'editor', 'viewer'])
+  @role_accessibility(['admin', 'editor'])
   def get(self, request, file_id):
     """
     Return a file response with the specified file_id.
@@ -113,9 +114,10 @@ class DownloadFileView(APIView):
     """
     try:
       file = File.objects.get(id=file_id)
+      shared_file_with_user = SharedFile.objects.filter(file=file, receiver_email=request.owner.email).exists()
 
       # Check if the user has permission to download the file
-      if str(file.owner) != str(request.owner):
+      if str(file.owner) != str(request.owner) and not shared_file_with_user:
         return Response({"error": "You do not have permission to download this file"}, status=status.HTTP_403_FORBIDDEN)
       
       # Decrypt the file

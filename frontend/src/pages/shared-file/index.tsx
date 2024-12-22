@@ -8,8 +8,8 @@ const SharedFilePage = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [fileData, setFileData] = useState<any>({
     filename: "",
+    url: "",
   });
-  const [fileUrl, setFileUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (!uuid) return;
@@ -21,9 +21,10 @@ const SharedFilePage = () => {
           type: response.headers["content-type"],
         });
         const url = URL.createObjectURL(blob);
-        setFileUrl(url);
         setFileData({
-          filename: "chisel.pdf",
+          filename: response.headers["content-disposition"],
+          url,
+          type: response.headers["content-type"],
         });
       } catch (err) {
         console.error(err);
@@ -35,13 +36,10 @@ const SharedFilePage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-4">File Preview: {fileData.filename}</h1>
-      <FilePreview
-        file={{
-          filename: fileData.filename,
-          fileUrl,
-        }}
-      />
+      <h1 className="text-2xl font-bold mb-4">
+        File Preview: {fileData.filename}
+      </h1>
+      <FilePreview file={fileData} />
     </div>
   );
 };

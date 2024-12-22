@@ -200,6 +200,17 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
 ]
 
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "authorization",
+    "content-type",
+    "content-disposition",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+    'x-filename',
+]
+
 CORS_ALLOW_CREDENTIALS = True
 
 # Cookie Settings

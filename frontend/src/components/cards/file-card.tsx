@@ -200,11 +200,7 @@ const FileCard = ({
         <FilePreviewModal
           open={isViewFileDialogOpen}
           onClose={() => setIsViewFileDialogOpen(false)}
-          file={{
-            name,
-            type: "file",
-            url: `/api/resources/${id}`,
-          }}
+          fileId={id}
         />
       )}
 

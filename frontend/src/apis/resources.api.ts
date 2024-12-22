@@ -43,7 +43,7 @@ const resourcesApi = {
     return response.data;
   },
   viewFile: async function (fileUuid: string) {
-    const response = await api.get(`resources/public/files/${fileUuid}/`, {
+    const response = await api.get(`resources/public/files/download/${fileUuid}/`, {
       responseType: "blob",
     });
     return response;

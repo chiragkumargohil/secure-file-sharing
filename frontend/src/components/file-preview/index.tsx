@@ -2,22 +2,24 @@ import { File } from "lucide-react";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function FilePreview({ file }: { file: any }) {
-  const fileType = file?.filename?.split(".").pop().toLowerCase();
-  const fileUrl = file?.fileUrl;
+  const fileType = file?.type || "";
+  const fileUrl = file?.url;
 
   const renderPreview = () => {
     switch (true) {
-      case ["jpg", "jpeg", "png", "gif", "bmp", "svg"].includes(fileType):
+      case fileType.startsWith("image"):
         return (
           <div className="relative w-full max-h-96">
             <img
               src={fileUrl}
               alt={file.filename}
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain block max-h-96"
+              width="100%"
+              height="100%"
             />
           </div>
         );
-      case fileType === "mp4":
+      case fileType.startsWith("video"):
         return (
           <video
             src={fileUrl}
@@ -25,9 +27,9 @@ export default function FilePreview({ file }: { file: any }) {
             className="w-full h-96 object-contain"
           ></video>
         );
-      case fileType === "mp3":
+      case fileType.startsWith("audio"):
         return <audio src={fileUrl} controls className="w-full h-96"></audio>;
-      case fileType === "pdf":
+      case fileType.startsWith("pdf"):
         return (
           <iframe
             src={fileUrl + "#toolbar=0&navpanes=0&scrollbar=0"}
@@ -53,15 +55,8 @@ export default function FilePreview({ file }: { file: any }) {
     }
   };
 
-  const getFileIcon = () => {
-    return <File className="mr-2" />;
-  };
-
   return (
-    <div className="bg-white shadow-md rounded-lg overflow-hidden">
-      <div className="p-4 border-b">
-        <div className="flex items-center">{getFileIcon()}</div>
-      </div>
+    <div className="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200">
       <div className="p-4">{renderPreview()}</div>
     </div>
   );

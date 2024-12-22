@@ -35,7 +35,7 @@ class JWTAuthenticationMiddleware:
 
     def __call__(self, request):
         # Skip token validation for login/signup or non-API endpoints
-        if request.path.startswith('/api/') and request.path not in ALLOWED_PATHS and request.path.startswith('/api/resources/files/public/') == False and request.path.startswith('/api/users/forgot-password/') == False and request.path.startswith('/api/users/reset-password/') == False:
+        if request.path.startswith('/api/') and request.path not in ALLOWED_PATHS and request.path.startswith('/api/resources/public/files/download/') == False and request.path.startswith('/api/users/forgot-password/') == False and request.path.startswith('/api/users/reset-password/') == False:
             token = ""
             
             tokens = request.COOKIES

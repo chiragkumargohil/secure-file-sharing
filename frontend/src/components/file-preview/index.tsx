@@ -29,7 +29,7 @@ export default function FilePreview({ file }: { file: any }) {
         );
       case fileType.startsWith("audio"):
         return <audio src={fileUrl} controls className="w-full h-96"></audio>;
-      case fileType.startsWith("pdf"):
+      case fileType.startsWith("application/pdf"):
         return (
           <iframe
             src={fileUrl + "#toolbar=0&navpanes=0&scrollbar=0"}

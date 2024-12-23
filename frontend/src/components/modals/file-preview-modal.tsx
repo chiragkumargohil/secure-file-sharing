@@ -27,14 +27,11 @@ const FilePreviewModal = ({ open, onClose, fileId }: FilePreviewModalProps) => {
       try {
         const response = await resourcesApi.downloadFile(fileId as string);
         const data = response.data;
-        const contentDisposition = response.headers["Content-Disposition"];
         const blob = new Blob([data], {
           type: response.headers["content-type"],
         });
 
-        const filename = contentDisposition
-          ? contentDisposition.split("filename=")[1]
-          : "";
+        const filename = response.headers["x-filename"] ?? "(untitled)";
 
         const url = URL.createObjectURL(blob);
         setFileData({
@@ -48,6 +45,10 @@ const FilePreviewModal = ({ open, onClose, fileId }: FilePreviewModalProps) => {
     };
 
     fetchFileDetails();
+
+    return () => {
+      URL.revokeObjectURL(fileData.url);
+    };
   }, [fileId]);
 
   return (

@@ -138,9 +138,9 @@ class DownloadFileView(APIView):
           filename = filename[:-4]
       
       # Return the file response
-      respose = FileResponse(ContentFile(decrypted_data), as_attachment=True, filename=filename)
-      respose['x-filename'] = filename
-      return respose
+      response = FileResponse(ContentFile(decrypted_data), as_attachment=True, filename=filename)
+      response['x-filename'] = filename
+      return response
     except ValueError:
       return Response({"error": "Invalid file"}, status=status.HTTP_400_BAD_REQUEST)
     except File.DoesNotExist:

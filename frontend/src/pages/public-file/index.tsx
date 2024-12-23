@@ -25,7 +25,7 @@ const PublicFilePage = () => {
         });
         const url = URL.createObjectURL(blob);
         setFileData({
-          filename: response.headers["content-disposition"],
+          filename: response.headers["x-filename"] ?? "(untitled)",
           url,
           type: response.headers["content-type"],
         });
@@ -42,6 +42,10 @@ const PublicFilePage = () => {
     };
 
     fetchFileDetails();
+
+    return () => {
+      URL.revokeObjectURL(fileData.url);
+    };
   }, [uuid]);
 
   if (error) return <Error type={error} />;
@@ -49,7 +53,7 @@ const PublicFilePage = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-4">
-        File Preview: {fileData.filename}
+        File: {fileData.filename}
       </h1>
       <FilePreview file={fileData} />
     </div>

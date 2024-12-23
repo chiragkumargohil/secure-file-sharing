@@ -14,6 +14,7 @@ from pathlib import Path
 from datetime import timedelta
 import os
 from dotenv import load_dotenv
+from corsheaders.defaults import default_headers
 
 # Load environment variables from .env file
 load_dotenv()
@@ -204,15 +205,18 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
 ]
 
-CORS_ALLOW_HEADERS = [
-    "accept",
-    "authorization",
-    "content-type",
-    "content-disposition",
-    "user-agent",
-    "x-csrftoken",
-    "x-requested-with",
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'x-file-owner-email',
     'x-filename',
+    'x-file-size',
+    'x-file-created-at',
+]
+
+CORS_EXPOSE_HEADERS = [
+    'x-file-owner-email',
+    'x-filename',
+    'x-file-size',
+    'x-file-created-at',
 ]
 
 CORS_ALLOW_CREDENTIALS = True

@@ -252,6 +252,8 @@ class UserProfileView(APIView):
                 'role': role
             }
             
+            print(data)
+            
             return Response(data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": "Something went wrong", "message": str(e)}, status=500)

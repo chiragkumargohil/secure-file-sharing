@@ -20,6 +20,7 @@ const resourcesApi = {
     const response = await api.get(`resources/files/download/${fileId}/`, {
       responseType: "blob",
     });
+    console.log(response.headers);
     return response;
   },
   deleteFile: async function (fileId: string) {

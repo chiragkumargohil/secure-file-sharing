@@ -56,6 +56,9 @@ class PublicFileView(APIView):
       
       response = FileResponse(ContentFile(decrypted_data), as_attachment=True, filename=filename)
       response['x-filename'] = filename
+      response['x-file-size'] = file.size
+      response['x-file-owner-email'] = file.owner
+      response['x-file-created-at'] = file.created_at
       return response
     except PublicFile.DoesNotExist:
       return Response({"error": "Link not found"}, status=status.HTTP_404_NOT_FOUND)

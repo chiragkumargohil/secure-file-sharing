@@ -140,6 +140,9 @@ class DownloadFileView(APIView):
       # Return the file response
       response = FileResponse(ContentFile(decrypted_data), as_attachment=True, filename=filename)
       response['x-filename'] = filename
+      response['x-file-size'] = file.size
+      response['x-file-owner-email'] = file.owner
+      response['x-file-created-at'] = file.created_at
       return response
     except ValueError:
       return Response({"error": "Invalid file"}, status=status.HTTP_400_BAD_REQUEST)

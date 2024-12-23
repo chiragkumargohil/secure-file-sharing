@@ -20,6 +20,7 @@ class FileSerializer(ModelSerializer):
 
 class SharedFileSerializer(ModelSerializer):
     id = SerializerMethodField()
+    owner = SerializerMethodField()
     filename = SerializerMethodField()
     file = SerializerMethodField()
     size = SerializerMethodField()
@@ -32,6 +33,7 @@ class SharedFileSerializer(ModelSerializer):
         model = SharedFile
         fields = [
             'id',
+            'owner',
             'filename',
             'file',
             'size',
@@ -46,6 +48,9 @@ class SharedFileSerializer(ModelSerializer):
 
     def get_filename(self, obj):
         return obj.file.filename
+    
+    def get_owner(self, obj):
+        return obj.file.owner.email
 
     def get_file(self, obj):
         return obj.file.file.url if obj.file.file else None

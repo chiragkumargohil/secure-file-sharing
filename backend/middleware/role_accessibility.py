@@ -21,14 +21,3 @@ def role_accessibility(roles):
         
         return _wrapped_view
     return decorator
-
-# def role_accessibility(roles):
-#     def decorator(view_func):
-#         @wraps(view_func)
-#         def _wrapped_view(request, *args, **kwargs):
-#             print("fsdfsdf", request.user)
-#             if request.user.role not in roles:
-#                 return JsonResponse({"error": "Access denied"}, status=403)
-#             return view_func(request, *args, **kwargs)
-#         return _wrapped_view
-#     return decorator

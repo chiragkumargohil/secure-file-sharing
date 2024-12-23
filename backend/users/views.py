@@ -252,8 +252,6 @@ class UserProfileView(APIView):
                 'role': role
             }
             
-            print(data)
-            
             return Response(data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": "Something went wrong", "message": str(e)}, status=500)
@@ -318,10 +316,9 @@ class ForgotPasswordView(APIView):
             print(reset_link)
 
             # Send email
-            send_mail(
+            send_email(
                 subject="Password Reset Request",
                 message=f"Click the link to reset your password: {reset_link}",
-                from_email="no-reply@secureapp.com",
                 recipient_list=[email],
             )
 

@@ -7,6 +7,7 @@ import {
 import FilePreview from "../file-preview";
 import { useEffect, useState } from "react";
 import resourcesApi from "@/apis/resources.api";
+import FileOwnerAvatar from "../file-owner-avatar";
 
 interface FilePreviewModalProps {
   open: boolean;
@@ -38,6 +39,7 @@ const FilePreviewModal = ({ open, onClose, fileId }: FilePreviewModalProps) => {
           filename: filename,
           url,
           type: response.headers["content-type"],
+          owner: response.headers["x-file-owner-email"],
         });
       } catch (err) {
         console.error(err);
@@ -54,7 +56,8 @@ const FilePreviewModal = ({ open, onClose, fileId }: FilePreviewModalProps) => {
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl w-full">
-        <DialogHeader>
+        <DialogHeader className="flex-row items-center space-x-4">
+          {fileData.owner && <FileOwnerAvatar value={fileData.owner} />}
           <DialogTitle className="text-2xl">{fileData.filename}</DialogTitle>
         </DialogHeader>
         <div className="mt-4">

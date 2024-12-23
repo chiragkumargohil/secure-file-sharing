@@ -69,6 +69,7 @@ const Home = () => {
         onDelete={() => {
           getFiles();
         }}
+        owner={activeTab === "shared-files" && file.owner}
         viewButtons={fileViewButtonsObject}
         hideActions={activeTab === "shared-files" || role === "viewer"}
       />

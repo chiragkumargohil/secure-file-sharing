@@ -35,10 +35,12 @@ const Tooltip = ({
   children: React.ReactNode;
 }) => {
   return (
-    <MyTooltip>
-      <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent>{title}</TooltipContent>
-    </MyTooltip>
+    <TooltipProvider delayDuration={0}>
+      <MyTooltip>
+        <TooltipTrigger asChild>{children}</TooltipTrigger>
+        <TooltipContent>{title}</TooltipContent>
+      </MyTooltip>
+    </TooltipProvider>
   );
 };
 

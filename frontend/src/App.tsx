@@ -114,15 +114,7 @@ const App = () => {
   return (
     <>
       <RouterProvider router={router} />
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          style: {
-            background: "var(--background)",
-            color: "var(--foreground)",
-          },
-        }}
-      />
+      <Toaster position="top-center" />
     </>
   );
 };

@@ -1,4 +1,5 @@
 import { File } from "lucide-react";
+import PdfPreview from "../pdf-preview";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function FilePreview({ file }: { file: any }) {
@@ -30,13 +31,7 @@ export default function FilePreview({ file }: { file: any }) {
       case fileType.startsWith("audio"):
         return <audio src={fileUrl} controls className="w-full h-96"></audio>;
       case fileType.startsWith("application/pdf"):
-        return (
-          <iframe
-            src={fileUrl + "#toolbar=0&navpanes=0&scrollbar=0"}
-            title="PDF Preview"
-            style={{ width: "100%", height: "500px", border: "none" }}
-          ></iframe>
-        );
+        return <PdfPreview file={fileUrl} />;
       case ["txt", "csv"].includes(fileType):
         return (
           <iframe

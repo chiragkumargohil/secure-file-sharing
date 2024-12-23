@@ -25,6 +25,7 @@ import ShareSettingsModal from "../modals/share-settings-modal";
 import { ShareFileModal } from "../modals/share-file-modal";
 import FilePreviewModal from "../modals/file-preview-modal";
 import { toast } from "sonner";
+import FileOwnerAvatar from "../file-owner-avatar";
 
 interface FileCardProps {
   id: string;
@@ -32,6 +33,7 @@ interface FileCardProps {
   size: number;
   updatedAt: Date;
   accessType?: "download" | "view";
+  owner?: string;
   onDelete: () => void;
   hideActions?: boolean;
   viewButtons?: {
@@ -49,6 +51,7 @@ const FileCard = ({
   updatedAt,
   onDelete,
   accessType = "download",
+  owner,
   viewButtons = {
     download: true,
     view: true,
@@ -172,11 +175,14 @@ const FileCard = ({
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <div className="text-sm text-gray-500 mb-4">
-          <p>Size: {formatFileSize(size)}</p>
-          <p>
-            Updated: {updatedAt ? new Date(updatedAt).toLocaleString() : "-"}
-          </p>
+        <div className="flex items-center justify-between mb-4">
+          <div className="text-sm text-gray-500 mb-4">
+            <p>Size: {formatFileSize(size)}</p>
+            <p>
+              Updated: {updatedAt ? new Date(updatedAt).toLocaleString() : "-"}
+            </p>
+          </div>
+          {owner && <FileOwnerAvatar value={owner} />}
         </div>
       </CardContent>
 

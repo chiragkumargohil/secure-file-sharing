@@ -1,5 +1,6 @@
 import resourcesApi from "@/apis/resources.api";
 import Error from "@/components/error";
+import FileOwnerAvatar from "@/components/file-owner-avatar";
 import FilePreview from "@/components/file-preview";
 import { TError } from "@/types";
 import { useEffect, useState } from "react";
@@ -28,6 +29,7 @@ const PublicFilePage = () => {
           filename: response.headers["x-filename"] ?? "(untitled)",
           url,
           type: response.headers["content-type"],
+          owner: response.headers["x-file-owner-email"],
         });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
@@ -51,10 +53,11 @@ const PublicFilePage = () => {
   if (error) return <Error type={error} />;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-4">
-        File: {fileData.filename}
-      </h1>
+    <div className="container mx-auto px-4 py-8 space-y-4">
+      <div className="flex items-center space-x-2">
+        {fileData.owner && <FileOwnerAvatar value={fileData.owner} />}{" "}
+        <h1 className="text-2xl font-bold">{fileData.filename}</h1>
+      </div>
       <FilePreview file={fileData} />
     </div>
   );

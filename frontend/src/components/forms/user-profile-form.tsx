@@ -1,16 +1,13 @@
-import { useDispatch, useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import usersApi from "@/apis/users.api";
-import { setUser } from "@/redux/slices/auth-slice";
 import { toast } from "sonner";
+import useAuth from "@/hooks/use-auth";
 
 const UserProfileForm = () => {
-  const dispatch = useDispatch();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { user } = useSelector((state: any) => state.auth);
+  const { user, login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -22,14 +19,12 @@ const UserProfileForm = () => {
         last_name: data.lastName,
         is_mfa_enabled: data.isMfaEnabled === "on",
       });
-      dispatch(
-        setUser({
-          ...user,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          isMfaEnabled: data.isMfaEnabled === "on",
-        })
-      );
+      login({
+        ...user,
+        first_name: data.firstName,
+        last_name: data.lastName,
+        is_mfa_enabled: data.isMfaEnabled === "on",
+      });
       toast.success("Profile updated successfully");
     } catch (error) {
       console.error(error);

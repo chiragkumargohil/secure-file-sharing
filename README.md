@@ -26,6 +26,7 @@ A secure web application for file sharing with advanced encryption, multi-factor
 - Django REST Framework for API development.
 - Leveraged Docker and Docker Compose for containerization.
 - Implemented multi-factor authentication with TOTP and email verification.
+   - Note: MFA is not enabled by default and MFA won't work if EMAIL_HOST_USER is not set.
 - Implemented role-based access control for different user roles.
 - Implemented file encryption and decryption
 
@@ -143,7 +144,7 @@ cd secure-file-sharing
    docker-compose up --build
    ```
 2. Access the application:
-   - Backend: `http://localhost:8000`  
+   - Backend: `http://127.0.0.1:8000`  
    - Frontend: `http://localhost:3000`  
 
 ---

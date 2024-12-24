@@ -61,21 +61,95 @@ A secure web application for file sharing with advanced encryption, multi-factor
 
 ## Database Schema
 
-### User
-- Stores user information, including email, MFA settings.  
-- Custom methods for string representation and fields for MFA-related data.  
+#### **User Table**
+- **Fields**:  
+  - `id`: Primary key, auto-incremented.  
+  - `email`: Unique email address of the user.  
+  - `username`: Username chosen by the user.  
+  - `first_name`: First name of the user.  
+  - `last_name`: Last name of the user.  
+  - `selected_drive`: Tracks the user’s currently active drive.
 
-### File
-- Stores file metadata, including the owner, filename, MIME type, size, and timestamps.  
-- Links each file to its owner using a foreign key.  
+---
 
-### Public File
-- Tracks public file sharing details, including a UUID, expiration status, and timestamps.  
-- Generates public links dynamically and validates link expiration.
+#### **File Table**
+- **Fields**:  
+  - `id`: Primary key, auto-incremented.  
+  - `owner`: Foreign key linking to the `User` table (represents the file owner).  
+  - `filename`: Name of the uploaded file.  
+  - `file`: Encrypted file data stored in private storage.  
+  - `mime_type`: MIME type of the file (e.g., `application/pdf`).  
+  - `size`: Size of the file in bytes.  
+  - `created_at`: Timestamp for file creation.  
+  - `updated_at`: Timestamp for the last update.  
+  - `encryption_key`: Binary field storing the encryption key (AES-256).  
+  - `encryption_iv`: Binary field storing the initialization vector for encryption.  
+  - `encryption_tag`: Binary field storing the GCM tag for verification.  
+  - `added_by`: Foreign key linking to the `User` table, tracking who added the file (optional).
 
-### Shared File
-- Tracks shared file details, including a owner, file, receiver email, and access type.
-- Links each shared file to its owner and file using foreign keys.
+---
+
+#### **SharedFile Table**
+- **Fields**:  
+  - `id`: Primary key, auto-incremented.  
+  - `file`: Foreign key linking to the `File` table.  
+  - `sender_user`: Foreign key linking to the `User` table (represents the user sharing the file).  
+  - `receiver_email`: Email of the user with whom the file is shared.  
+  - `access_type`: Access permission type (`view`, `download`, `edit`).  
+  - `message`: Optional message shared along with the file.  
+  - `created_at`: Timestamp for when the file was shared.  
+  - `updated_at`: Timestamp for the last update.  
+  - `shared_by`: Foreign key linking to the `User` table, tracking who shared the file (optional).
+
+---
+
+#### **PublicFile Table**
+- **Fields**:  
+  - `id`: Primary key, auto-incremented.  
+  - `uuid`: Unique identifier for the public file link.  
+  - `file`: One-to-one relationship with the `File` table.  
+  - `is_active`: Boolean field indicating whether the link is active.  
+  - `expiration_date`: Date and time when the public link expires (optional).  
+  - `created_at`: Timestamp for link creation.  
+  - `updated_at`: Timestamp for the last update.  
+  - `shared_by`: Foreign key linking to the `User` table, tracking who created the public link (optional).
+
+---
+
+#### **DriveAccess Table**
+- **Fields**:  
+  - `id`: Primary key, auto-incremented.  
+  - `owner`: Foreign key linking to the `User` table (represents the owner of the drive).  
+  - `receiver_email`: Email of the user who is granted access to the drive.  
+  - `role`: Role assigned to the receiver (`admin`, `editor`, `viewer`).  
+  - `created_at`: Timestamp for when the access was granted.  
+  - `updated_at`: Timestamp for the last update.  
+  - `added_by`: Foreign key linking to the `User` table, tracking who added the drive access (optional).
+
+### **Logic**
+
+1. **Drive Access Logic:**  
+   - Each user is allowed to create their own drive.  
+   - The `DriveAccess` table uses a combination of `receiver_email` and `owner` fields to manage drive access.  
+   - This design allows the owner to invite other users by their email, even if the invited users are not yet registered in the system.  
+   - When the invited user registers, they automatically gain access to the drive based on the existing `DriveAccess` entry and invited user can also have user's own drive.
+
+2. **File Sharing Logic:**  
+   - The `SharedFile` table allows sharing files using the `receiver_email` field.  
+   - This means files can be shared with users who are not yet registered in the system.  
+   - Once the receiver registers, they can see the files shared with them using their email.  
+   - This approach ensures that file sharing is seamless and does not depend on the receiver being an existing user of the system or the drive.
+
+3. **Role-Based Access Control:**  
+   - In the `DriveAccess` table, the `role` field (`admin`, `editor`, `viewer`) defines the type of permissions granted to a user for a particular drive.  
+   - Similarly, in the `SharedFile` table, the `access_type` field (`view`, `download`, `edit`) defines the level of access granted for a specific file.
+
+4. **Public File Sharing Logic:**  
+   - The `PublicFile` table generates a unique `uuid` for each public link.  
+   - Public links can be dynamically generated and shared, with an optional expiration date to ensure time-limited access.  
+   - The `is_active` field ensures control over whether a public link is currently usable.  
+
+This combination of logic ensures flexibility, scalability, and seamless collaboration between registered and unregistered users.
 
 ---
 

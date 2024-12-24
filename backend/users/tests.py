@@ -5,7 +5,6 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 from .models import User
-import json
 
 class UserAPITests(TestCase):
     def setUp(self):

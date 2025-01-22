@@ -219,7 +219,7 @@ cd secure-file-sharing
    ```
 2. Access the application:
    - Backend: `http://127.0.0.1:8000`  
-   - Frontend: `http://localhost:3000`  
+   - Frontend: `http://localhost:5173`  
 
 ---
 

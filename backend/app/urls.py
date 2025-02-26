@@ -23,5 +23,4 @@ urlpatterns = [
     path("api/resources/", include("files.urls")),
     path("api/resources/public/", include("public_files.urls")),
     path("api/resources/shared/", include("shared_files.urls")),
-    path('monitoring/', include('django_prometheus.urls')),
 ]

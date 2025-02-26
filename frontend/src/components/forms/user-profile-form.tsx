@@ -33,7 +33,7 @@ const UserProfileForm = () => {
   };
 
   return (
-    <form className="space-y-8 max-w-2xl" onSubmit={handleSubmit}>
+    <form className="space-y-8 max-w-full" onSubmit={handleSubmit}>
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input

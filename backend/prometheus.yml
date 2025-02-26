@@ -1,9 +1,0 @@
-global:
-  scrape_interval: 60s
-  evaluation_interval: 60s
-
-scrape_configs:
-  - job_name: "django"
-    metrics_path: "/monitoring/metrics"
-    static_configs:
-      - targets: ["secure-backend:8000"]

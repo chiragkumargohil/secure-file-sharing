@@ -1,7 +1,6 @@
 from django.db import models
 from django.conf import settings
 from common.utils.file_encryption import encrypt_file
-from Crypto.Random import get_random_bytes
 from django.core.files.base import ContentFile
 
 # the file directory will be stored in the secure_files folder with user id as the folder name

@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'files',
     'public_files',
     'shared_files',
+    'file_chat',
 ]
 
 MIDDLEWARE = [

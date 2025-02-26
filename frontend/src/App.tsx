@@ -22,6 +22,7 @@ import ResetPasswordPage from "./pages/reset-password";
 import { TAuthState } from "./types";
 import PrimaryLayout from "./components/layouts/primary-layout";
 import Loader from "./components/loader";
+import FileChatPage from "./pages/file-chat";
 
 const PrivateRoute = () => {
   const { user } = useSelector((state: TAuthState) => state.auth);
@@ -77,6 +78,7 @@ const App = () => {
         { path: "/", element: <HomePage /> },
         { path: "/access", element: <AccessPage /> },
         { path: "/profile", element: <ProfilePage /> },
+        { path: "/file/chat/:fileId", element: <FileChatPage /> },
       ],
     },
     {

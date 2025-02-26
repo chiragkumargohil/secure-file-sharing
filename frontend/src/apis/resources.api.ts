@@ -27,6 +27,14 @@ const resourcesApi = {
     const response = await api.delete(`resources/files/${fileId}/`);
     return response.data;
   },
+  getFileChat: async function (fileId: string) {
+    const response = await api.get(`resources/files/chat/${fileId}/`);
+    return response.data;
+  },
+  sendFileChatMessage: async function (fileId: string, data: { content: string }) {
+    const response = await api.post(`resources/files/chat/${fileId}/`, data);
+    return response.data;
+  },
 
   // public files
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -44,9 +52,12 @@ const resourcesApi = {
     return response.data;
   },
   viewFile: async function (fileUuid: string) {
-    const response = await api.get(`resources/public/files/download/${fileUuid}/`, {
-      responseType: "blob",
-    });
+    const response = await api.get(
+      `resources/public/files/download/${fileUuid}/`,
+      {
+        responseType: "blob",
+      }
+    );
     return response;
   },
 

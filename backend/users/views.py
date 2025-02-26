@@ -25,6 +25,7 @@ from django.core.files import File
 from middleware.role_accessibility import role_accessibility
 from common.utils.otp_utils import send_otp, verify_otp
 from common.utils.send_email import send_email
+from .tasks import send_bulk_email
 
 User = get_user_model()
 
@@ -229,6 +230,8 @@ class UserProfileView(APIView):
         try:
             user = request.user  # User is attached via middleware
             user = ProfileSerializer(user).data
+
+            send_bulk_email.delay()
             
             # fetch the drives user has access to
             drives = DriveAccess.objects.filter(receiver_email=user['email'])

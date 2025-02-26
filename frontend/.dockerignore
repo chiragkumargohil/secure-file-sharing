@@ -8,7 +8,7 @@ __pycache__
 db.sqlite3
 
 # Ignore environment variables file
-.env
+# .env
 
 # Ignore the node_modules directory from React (to be rebuilt inside the container)
 node_modules

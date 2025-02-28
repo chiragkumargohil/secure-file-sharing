@@ -6,6 +6,7 @@ from .models import FileChat, FileChatMessage
 from rest_framework import status
 from rest_framework.decorators import authentication_classes
 from middleware.skip_csrf import CSRFExemptSessionAuthentication
+from common.ai.rag.generation import query
 
 @authentication_classes([CSRFExemptSessionAuthentication])
 class FileChatMessagesView(APIView):
@@ -57,7 +58,7 @@ class FileChatMessagesView(APIView):
             # user message
             FileChatMessage.objects.create(user=request.user, chat=chat, role='user', content=content)
 
-            assistant_response = "I will get back to you soon"
+            assistant_response = query(content)
 
             # assistant message
             FileChatMessage.objects.create(user=request.user, chat=chat, role='assistant', content=assistant_response)

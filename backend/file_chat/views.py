@@ -24,7 +24,7 @@ class FileChatMessagesView(APIView):
             file = File.objects.get(id=file_id)
             # get the number of chat entries
             num_chat_entries = FileChat.objects.filter(file=file, user=request.owner).count()
-            
+
             chat = None
             if num_chat_entries == 0:
                 chat = FileChat.objects.create(user=request.owner, file=file)
@@ -58,14 +58,13 @@ class FileChatMessagesView(APIView):
             # user message
             FileChatMessage.objects.create(user=request.user, chat=chat, role='user', content=content)
 
-            assistant_response = query(content)
-
             # assistant message
+            assistant_response = query(content)
             FileChatMessage.objects.create(user=request.user, chat=chat, role='assistant', content=assistant_response)
             
             data = {
-            "role": 'assistant',
-            "content": assistant_response,
+                "role": 'assistant',
+                "content": assistant_response,
             }
 
             return Response({"data": data}, status=status.HTTP_200_OK)

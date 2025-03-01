@@ -37,7 +37,14 @@ class FileChatMessagesView(APIView):
 
             chat_history = FileChatMessage.get_chat_history_by_file(file)
             chat_history = [{"role": chat.role, "content": chat.content, "created_at": chat.created_at} for chat in chat_history]
-            return Response({"chat_history": chat_history}, status=status.HTTP_200_OK)
+            data = {
+                "id": file.id,
+                "name": file.filename,
+                "size": file.size,
+                "created_at": file.created_at,
+                "chat_history": chat_history
+            }
+            return Response(data, status=status.HTTP_200_OK)
         except File.DoesNotExist:
             return Response({"error": "File not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:

@@ -32,21 +32,24 @@ class VectorStore:
     def add_content_file(self, content_file: ContentFile, metadata: dict | None = None):
         # create a temporary file to provide the file path to the vector store and remove the file
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        new_file_path = os.path.join(current_dir, f"temp_{datetime.now().strftime('%Y%m%d%H%M%S')}")
+        file_name = f"temp_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+        new_file_path = os.path.join(current_dir, file_name)
         with open(new_file_path, "wb") as f:
             f.write(content_file.read())
         retriever = Retriever(file_path=new_file_path)        
         documents = retriever.load_and_split()
 
         # add metadata
-        if isinstance(metadata, dict):
-            for document in documents:
-                if isinstance(document.metadata, dict):
+        for document in documents:
+            if isinstance(document.metadata, dict):
+                document.metadata["source"] = file_name
+                if isinstance(metadata, dict):
                     for key, value in metadata.items():
                         document.metadata[key] = value
 
         # remove the temporary file
         if os.path.exists(new_file_path):
+            f.close()
             os.remove(new_file_path)
 
         return self.vector_store.add_documents(documents=documents)

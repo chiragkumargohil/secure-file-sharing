@@ -10,8 +10,6 @@ from langchain.prompts import ChatPromptTemplate
 from common.ai.models import chat_model
 from common.ai.rag.vector_store import vector_store
 
-retriever = vector_store.as_retriever()
-
 system_prompt = (
     "You are an assistant for question-answering tasks. "
     "Use the following pieces of retrieved context to answer "
@@ -33,12 +31,14 @@ prompt = ChatPromptTemplate.from_messages(
 def format_docs(docs: list[dict]) -> str:
     return "\n\n".join(doc.page_content for doc in docs)
 
-rag_chain = (
-    {"context": retriever | format_docs, "question": RunnablePassthrough()}
-    | prompt
-    | chat_model
-    | StrOutputParser()
-)
 
-def query(question: str) -> str:
+def query(question: str, filter: dict | None = None) -> str:
+    retriever = vector_store.as_retriever(search_kwargs={"filter": filter})
+
+    rag_chain = (
+        {"context": retriever | format_docs, "question": RunnablePassthrough()}
+        | prompt
+        | chat_model
+        | StrOutputParser()
+    )
     return rag_chain.invoke(question)

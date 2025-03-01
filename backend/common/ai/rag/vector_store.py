@@ -8,6 +8,10 @@ import os
 from dotenv import load_dotenv
 from langchain_pinecone import PineconeVectorStore
 from common.ai.models import embeddings_model
+from django.core.files.base import ContentFile
+from common.ai.rag.retrieval import Retriever
+import os
+from datetime import datetime
 
 load_dotenv()
 
@@ -22,10 +26,32 @@ class VectorStore:
             index_name="file-store-v1"
         )
     
-    def as_retriever(self, *args, **kwargs):
-        return self.vector_store.as_retriever(*args, **kwargs)
+    def as_retriever(self, **kwargs):
+        return self.vector_store.as_retriever(**kwargs)
+    
+    def add_content_file(self, content_file: ContentFile, metadata: dict | None = None):
+        # create a temporary file to provide the file path to the vector store and remove the file
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        new_file_path = os.path.join(current_dir, f"temp_{datetime.now().strftime('%Y%m%d%H%M%S')}")
+        with open(new_file_path, "wb") as f:
+            f.write(content_file.read())
+        retriever = Retriever(file_path=new_file_path)        
+        documents = retriever.load_and_split()
 
-    def add(self, documents: list) -> list[str]:
+        # add metadata
+        if isinstance(metadata, dict):
+            for document in documents:
+                if isinstance(document.metadata, dict):
+                    for key, value in metadata.items():
+                        document.metadata[key] = value
+
+        # remove the temporary file
+        if os.path.exists(new_file_path):
+            os.remove(new_file_path)
+
+        return self.vector_store.add_documents(documents=documents)
+
+    def add_documents(self, documents: list) -> list[str]:
         return self.vector_store.add_documents(documents=documents)
     
     def query(self, query: str, k: int = 3, filter: dict | None = None):

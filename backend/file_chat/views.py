@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.decorators import authentication_classes
 from middleware.skip_csrf import CSRFExemptSessionAuthentication
 from common.ai.rag.generation import query
+from common.ai.rag.vector_store import vector_store
 
 @authentication_classes([CSRFExemptSessionAuthentication])
 class FileChatMessagesView(APIView):
@@ -24,13 +25,15 @@ class FileChatMessagesView(APIView):
             file = File.objects.get(id=file_id)
             # get the number of chat entries
             num_chat_entries = FileChat.objects.filter(file=file, user=request.owner).count()
-
+            
             chat = None
             if num_chat_entries == 0:
+                decrypted_file = file.get_decrypted_file()
+                vector_store.add_content_file(decrypted_file, metadata={"file_id": str(file.id)})
                 chat = FileChat.objects.create(user=request.owner, file=file)
                 FileChatMessage.objects.create(user=request.owner, chat=chat, role='assistant', content='Ask me anything about the file')
             else:
-                chat = FileChat.objects.get(user=request.owner, file=file)
+                chat = FileChat.objects.filter(file=file, user=request.owner).order_by('-created_at').first()
 
             chat_history = FileChatMessage.get_chat_history_by_file(file)
             chat_history = [{"role": chat.role, "content": chat.content, "created_at": chat.created_at} for chat in chat_history]
@@ -52,14 +55,14 @@ class FileChatMessagesView(APIView):
         """
         try:
             file = File.objects.get(id=file_id)
-            chat = FileChat.objects.get(user=request.user, file=file)
+            chat = FileChat.objects.filter(file=file, user=request.owner).order_by('-created_at').first()
             content = request.data.get('content')
 
             # user message
             FileChatMessage.objects.create(user=request.user, chat=chat, role='user', content=content)
 
             # assistant message
-            assistant_response = query(content)
+            assistant_response = query(content, filter={"file_id": {"$eq": str(file_id)}})
             FileChatMessage.objects.create(user=request.user, chat=chat, role='assistant', content=assistant_response)
             
             data = {

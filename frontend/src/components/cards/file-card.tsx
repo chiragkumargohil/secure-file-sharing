@@ -164,16 +164,18 @@ const FileCard = ({
                   >
                     Share with specific users
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={onChatWithFile}
-                    disabled={!viewButtons.share}
-                    className="cursor-pointer"
-                    title={
-                      !viewButtons.share ? "You don't have permission" : ""
-                    }
-                  >
-                    Chat with file
-                  </DropdownMenuItem>
+                  {name.endsWith(".pdf") && (
+                    <DropdownMenuItem
+                      onClick={onChatWithFile}
+                      disabled={!viewButtons.share}
+                      className="cursor-pointer"
+                      title={
+                        !viewButtons.share ? "You don't have permission" : ""
+                      }
+                    >
+                      Chat with file
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem
                     onClick={() => setIsDeleteDialogOpen(true)}
                     className="text-red-600 cursor-pointer"

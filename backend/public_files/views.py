@@ -7,8 +7,6 @@ from django.shortcuts import get_object_or_404
 from files.models import File
 from rest_framework.decorators import authentication_classes
 from middleware.skip_csrf import CSRFExemptSessionAuthentication
-from common.utils.file_encryption import decrypt_file
-from django.core.files.base import ContentFile
 from middleware.role_accessibility import role_accessibility
 from django.utils import timezone
 
@@ -37,24 +35,13 @@ class PublicFileView(APIView):
       
       file = public_file.file
 
-      # Decrypt the file
-      with open(file.file.path, 'rb') as f:
-          ciphertext = f.read()
-
-      decrypted_data = decrypt_file(
-          ciphertext,
-          file.encryption_key,
-          file.encryption_iv,
-          file.encryption_tag
-      )
-      
-      file.file.close()
+      decrypted_file = file.get_decrypted_file()
       
       filename = file.filename
       if filename.endswith('.enc'):
           filename = filename[:-4]
       
-      response = FileResponse(ContentFile(decrypted_data), as_attachment=True, filename=filename)
+      response = FileResponse(decrypted_file, as_attachment=True, filename=filename)
       response['x-filename'] = filename
       response['x-file-size'] = file.size
       response['x-file-owner-email'] = file.owner

@@ -1,7 +1,6 @@
 from django.db import models
 from django.conf import settings
 from common.utils.file_encryption import encrypt_file
-from Crypto.Random import get_random_bytes
 from django.core.files.base import ContentFile
 
 # the file directory will be stored in the secure_files folder with user id as the folder name
@@ -31,6 +30,31 @@ class File(models.Model):
     self.size = len(ciphertext)
     self.file.save(self.filename, ContentFile(ciphertext), save=False)
     super(File, self).save(*args, **kwargs)
+
+  def get_decrypted_file(self):
+    """
+    Return a ContentFile containing the decrypted file content.
+
+    This method will read the encrypted file content from the storage backend,
+    decrypt it using the stored encryption key, iv, and tag, and then return a
+    ContentFile object containing the decrypted content.
+
+    The file object is closed after reading, so it can be re-opened or used for
+    other operations without having to worry about the file being open.
+
+    Returns:
+      ContentFile: A ContentFile containing the decrypted file content.
+    """
+    from common.utils.file_encryption import decrypt_file
+    file_data = self.file.read()
+    plaintext = decrypt_file(
+      ciphertext = file_data,
+      iv = self.encryption_iv,
+      tag = self.encryption_tag,
+      key = self.encryption_key
+    )
+    self.file.close()
+    return ContentFile(plaintext)
 
   def __str__(self):
     return self.filename

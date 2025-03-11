@@ -43,3 +43,9 @@ export type TError = {
   type: "no-access" | "not-found" | "server-error" | "file-not-found";
   message?: string;
 };
+
+export type TAIChat = {
+  id: string | number;
+  role: string;
+  content: string;
+};

@@ -10,7 +10,6 @@ const useAuth = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const login = (user: any) => {
     if (!user || !user.email) return;
-    console.log(user);
     dispatch(
       setUser({
         email: user.email,

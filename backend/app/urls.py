@@ -23,4 +23,6 @@ urlpatterns = [
     path("api/resources/", include("files.urls")),
     path("api/resources/public/", include("public_files.urls")),
     path("api/resources/shared/", include("shared_files.urls")),
+    path("api/resources/shared/", include("shared_files.urls")),
+    path("api/resources/files/chat/", include("file_chat.urls")),
 ]

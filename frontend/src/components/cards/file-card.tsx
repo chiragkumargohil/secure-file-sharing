@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { MoreHorizontal } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -26,6 +24,7 @@ import { ShareFileModal } from "../modals/share-file-modal";
 import FilePreviewModal from "../modals/file-preview-modal";
 import { toast } from "sonner";
 import FileOwnerAvatar from "../file-owner-avatar";
+import { useNavigate } from "react-router-dom";
 
 interface FileCardProps {
   id: string;
@@ -60,6 +59,7 @@ const FileCard = ({
   },
   hideActions = false,
 }: FileCardProps) => {
+  const navigate = useNavigate();
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isShareSpecificDialogOpen, setIsShareSpecificDialogOpen] =
@@ -86,6 +86,10 @@ const FileCard = ({
     }
   };
 
+  const onChatWithFile = () => {
+    navigate(`/file/chat/${id}`);
+  };
+
   const handleDelete = async () => {
     try {
       await resourcesApi.deleteFile(id);
@@ -109,7 +113,7 @@ const FileCard = ({
   };
 
   return (
-    <Card className="w-full max-w-sm">
+    <Card className="w-full">
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold truncate" title={name}>
@@ -160,6 +164,18 @@ const FileCard = ({
                   >
                     Share with specific users
                   </DropdownMenuItem>
+                  {name.endsWith(".pdf") && (
+                    <DropdownMenuItem
+                      onClick={onChatWithFile}
+                      disabled={!viewButtons.share}
+                      className="cursor-pointer"
+                      title={
+                        !viewButtons.share ? "You don't have permission" : ""
+                      }
+                    >
+                      Chat with file
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem
                     onClick={() => setIsDeleteDialogOpen(true)}
                     className="text-red-600 cursor-pointer"

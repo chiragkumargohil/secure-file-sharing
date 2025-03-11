@@ -16,3 +16,5 @@ venv/
 *.env
 
 private_storage/
+
+db.sqlite3

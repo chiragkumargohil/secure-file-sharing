@@ -126,6 +126,22 @@ A secure web application for file sharing with advanced encryption, multi-factor
   - `updated_at`: Timestamp for the last update.  
   - `added_by`: Foreign key linking to the `User` table, tracking who added the drive access (optional).
 
+#### **File Chat Table**
+- **Fields**:  
+  - `id`: Primary key, auto-incremented.
+  - `file`: Foreign key linking to the `File` table.
+  - `user`: Foreign key linking to the `User` table.
+  - `created_at`: Timestamp for when the chat was created.
+
+#### **File Chat Message Table**
+- **Fields**:
+  - `id`: Primary key, auto-incremented.
+  - `chat`: Foreign key linking to the `FileChat` table.
+  - `user`: Foreign key linking to the `User` table.
+  - `role`: Role of the user in the chat (`user`, `assistant`).
+  - `content`: Content of the message.
+  - `created_at`: Timestamp for when the message was sent.
+
 ### **Logic**
 
 1. **Drive Access Logic:**  
@@ -147,7 +163,7 @@ A secure web application for file sharing with advanced encryption, multi-factor
 4. **Public File Sharing Logic:**  
    - The `PublicFile` table generates a unique `uuid` for each public link.  
    - Public links can be dynamically generated and shared, with an optional expiration date to ensure time-limited access.  
-   - The `is_active` field ensures control over whether a public link is currently usable.  
+   - The `is_active` field ensures control over whether a public link is currently usable.
 
 This combination of logic ensures flexibility, scalability, and seamless collaboration between registered and unregistered users.
 

@@ -31,7 +31,7 @@ export default function ChatForm({ disabled, onSubmit }: ChatFormProps) {
     <form
       ref={formRef}
       onSubmit={handleSubmit}
-      className="w-full space-y-2 shadow-lg py-4 px-3 border border-gray-200 rounded-xl"
+      className="w-full space-y-2 shadow-xl py-4 px-3 border border-gray-200 rounded-xl"
       onKeyDown={(e) => {
         if (e.key === "Enter" && !e.shiftKey) {
           e.preventDefault();

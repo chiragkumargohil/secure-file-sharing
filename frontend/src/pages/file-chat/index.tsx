@@ -9,6 +9,7 @@ import ChatResponseCard from "@/components/cards/chat-response-card";
 
 export default function FileChatPage() {
   const { fileId } = useParams();
+  const [name, setName] = useState("");
   const [messages, setMessages] = useState<TAIChat[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -17,7 +18,8 @@ export default function FileChatPage() {
     const fetchMessages = async () => {
       try {
         const data = await resourcesApi.getFileChat(fileId as string);
-        setMessages(data.chat_history);
+        setName(data?.name || "");
+        setMessages(data?.chat_history || []);
       } catch (error) {
         console.error(error);
         toast.error("Failed to fetch messages");
@@ -29,7 +31,11 @@ export default function FileChatPage() {
 
   useEffect(() => {
     if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+      console.log("scrolling");
+      scrollAreaRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
     }
   }, [messages.length]);
 
@@ -61,12 +67,13 @@ export default function FileChatPage() {
   };
 
   return (
-    <div className="relative h-full flex flex-col items-center justify-center max-w-2xl mx-auto">
+    <div className="relative h-full flex flex-col gap-2 items-center justify-center max-w-2xl mx-auto">
+      <h2 className="text-lg text-center font-semibold">{name}</h2>
       <div className="w-full h-full flex-1 flex flex-col justify-between gap-2">
-        <ScrollArea className="px-4" ref={scrollAreaRef}>
-          <div className="space-y-4 h-[calc(100vh-252px)]">
-            {messages.map((m: TAIChat) => (
-              <ChatResponseCard key={m.id} {...m} />
+        <ScrollArea className="px-4">
+          <div className="space-y-4 h-[calc(100vh-284px)]" ref={scrollAreaRef}>
+            {messages.map((m: TAIChat, i) => (
+              <ChatResponseCard key={m.id || i} {...m} />
             ))}
             {isTyping && (
               <div className="text-left">

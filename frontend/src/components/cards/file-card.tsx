@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { MoreHorizontal } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -115,7 +113,7 @@ const FileCard = ({
   };
 
   return (
-    <Card className="w-full max-w-sm">
+    <Card className="w-full">
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold truncate" title={name}>

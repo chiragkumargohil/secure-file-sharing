@@ -4,14 +4,17 @@ import DriveSwitcher from "@/components/drive-switcher";
 import {
   Sidebar,
   SidebarContent,
+  SidebarGroup,
   SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { Link } from "react-router-dom";
 import { Button } from "../ui";
 import usersApi from "@/apis/users.api";
 import useAuth from "@/hooks/use-auth";
-import { useSelector } from "react-redux";
 import { toast } from "sonner";
 
 // This is sample data.
@@ -34,30 +37,33 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { user } = useSelector((state: any) => state.auth);
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
 
   return (
-    <Sidebar {...props}>
+    <Sidebar variant="floating" {...props}>
       <SidebarHeader>
         <DriveSwitcher />
       </SidebarHeader>
       <SidebarContent className="gap-0 p-2">
-        {/* We create a collapsible SidebarGroup for each parent. */}
-        {data.navMain.map((item) => (
-          <Link to={item.url} key={item.title}>
-            <h3 className="px-3 py-2 text-base font-semibold rounded hover:bg-muted truncate">
-              {item.title === "Profile" ? (
-                <>
-                  Profile <span className="text-xs">({user?.email})</span>
-                </>
-              ) : (
-                item.title
-              )}
-            </h3>
-          </Link>
-        ))}
+        <SidebarGroup>
+          <SidebarMenu className="gap-2">
+            {data.navMain.map((item) => (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton asChild>
+                  <Link to={item.url} className="font-medium">
+                    {item.title === "Profile" ? (
+                      <>
+                        Profile <small>({user?.email})</small>
+                      </>
+                    ) : (
+                      item.title
+                    )}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
         <Button
           className="mt-auto"
           onClick={async () => {

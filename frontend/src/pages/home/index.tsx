@@ -103,12 +103,12 @@ const Home = () => {
             <h2 className="text-2xl font-bold mb-4">My Files</h2>
             {canUpload && <UploadFileModal fetchData={getFiles} />}
           </div>
-          <div className="flex flex-wrap gap-4">{renderFileCards(files)}</div>
+          <div className="space-y-4">{renderFileCards(files)}</div>
         </TabsContent>
         {canViewSharedFiles && (
           <TabsContent value="shared-files" className="space-y-2 py-2">
             <h2 className="text-2xl font-bold mb-4">Shared with Me</h2>
-            <div className="flex flex-wrap gap-4">{renderFileCards(files)}</div>
+            <div className="space-y-4">{renderFileCards(files)}</div>
           </TabsContent>
         )}
       </Tabs>
